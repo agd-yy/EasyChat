@@ -18,7 +18,7 @@ namespace EasyChat.ViewModel
 
         private string clientUID = Guid.NewGuid().ToString();
         private static MqttService service;
-        private MyMqttClient myClient = new MyMqttClient();
+        private MyMqttClient myClient = MyMqttClient.Instance();
 
         private MainViewModel()
         {

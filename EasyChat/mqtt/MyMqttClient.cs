@@ -12,7 +12,7 @@ using System.Windows;
 
 namespace EasyChat.MQTT
 {
-    public class MyMqttClient
+    public class MyMqttClient:SingletonUtils<MyMqttClient>
     {
         public IMqttClient mqttClient { get; private set; }
         private string IPAddress = "127.0.0.1";
@@ -26,6 +26,10 @@ namespace EasyChat.MQTT
         public event Action<string> ReceiveMsgEvent;
         public event Action<string> OnlinePersonEvent;
 
+        private MyMqttClient()
+        {
+
+        }
         /// <summary>
         /// 启动客户端
         /// </summary>
