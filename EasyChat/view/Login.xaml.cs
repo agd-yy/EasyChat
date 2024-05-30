@@ -1,20 +1,10 @@
 ﻿using MQTT_Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace EasyChat.view
 {
@@ -33,7 +23,22 @@ namespace EasyChat.view
         {
             this.WindowState = WindowState.Minimized;
         }
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServerIpTextBlock.Visibility = Visibility.Collapsed;
+            ServerIpTextBox.Visibility = Visibility.Collapsed;
+            LoginButton.Visibility = Visibility.Collapsed;
+            ServerIpTextBox.IsEnabled = true;
+            ServerIpTextBox.Text = "";
 
+            UsernameTextBox.Visibility = Visibility.Visible;
+            UsernameTextBlock.Visibility = Visibility.Visible;
+            PasswordTextBlock.Visibility = Visibility.Visible;
+            PasswordBox.Visibility = Visibility.Visible;
+            ServerButton.Visibility = Visibility.Visible;
+            ClientButton.Visibility = Visibility.Visible;
+            BackButton.Visibility = Visibility.Collapsed;
+        }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
@@ -70,6 +75,15 @@ namespace EasyChat.view
             ServerIpTextBox.Visibility = Visibility.Visible;
             ServerIpTextBox.IsEnabled = false;
             LoginButton.Visibility = Visibility.Visible;
+
+            UsernameTextBox.Visibility = Visibility.Collapsed;
+            UsernameTextBlock.Visibility = Visibility.Collapsed;
+            PasswordTextBlock.Visibility = Visibility.Collapsed;
+            PasswordBox.Visibility = Visibility.Collapsed;
+            ServerButton.Visibility = Visibility.Collapsed;
+            ClientButton.Visibility = Visibility.Collapsed;
+            BackButton.Visibility = Visibility.Visible;
+
             string ipAddress = string.Empty;
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -90,7 +104,24 @@ namespace EasyChat.view
             // 显示 IP 地址输入框和登录按钮
             ServerIpTextBlock.Visibility = Visibility.Visible;
             ServerIpTextBox.Visibility = Visibility.Visible;
+            ServerIpTextBox.IsEnabled = true;
             LoginButton.Visibility = Visibility.Visible;
+
+            UsernameTextBox.Visibility = Visibility.Collapsed;
+            UsernameTextBlock.Visibility = Visibility.Collapsed;
+            PasswordTextBlock.Visibility = Visibility.Collapsed;
+            PasswordBox.Visibility = Visibility.Collapsed;
+            ServerButton.Visibility = Visibility.Collapsed;
+            ClientButton.Visibility = Visibility.Collapsed;
+            BackButton.Visibility = Visibility.Visible;
+        }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
         }
     }
 }
