@@ -18,8 +18,13 @@ namespace EasyChat
         {
             _taskbar = (TaskbarIcon)FindResource("Taskbar");
             base.OnStartup(e);
+            _taskbar.Visibility = Visibility.Collapsed;
         }
 
-        private TaskbarIcon _taskbar;
+        public static TaskbarIcon _taskbar
+        {
+            get;
+            private set;
+        }
     }
 }

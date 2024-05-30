@@ -4,6 +4,7 @@ using MQTT_Server;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,17 +16,18 @@ namespace EasyChat.ViewModel
 {
     public class MainViewModel:SingletonUtils<MainViewModel>,INotifyPropertyChanged
     {
-
-        private string clientUID = Guid.NewGuid().ToString();
-        private static MqttService service;
         private MyMqttClient myClient = MyMqttClient.Instance();
+        // 客户端的昵称，以后可以添加一个登录界面，这个和登录用户名绑定
+        private string clientUID = Guid.NewGuid().ToString();
+        private string nickName;
+
+        private HashSet<string> onlineClientUid = new HashSet<string>();
 
         private MainViewModel()
         {
-            // 启动服务端，临时本地当服务端
-            service = MqttService.CreateMqttService();
-            // 客户端id
-            SubscribeUid = clientUID;
+            // 客户端名绑定界面
+            nickName = clientUID;
+            SubscribeUid = nickName;
             //启动客户端
             myClient.ChangeClientUid(clientUID);
             myClient.StartClient();
@@ -38,10 +40,11 @@ namespace EasyChat.ViewModel
         /// <summary>
         /// 客户端修改页面在线用户
         /// </summary>
-        /// <param name="needAdd"></param>
-        private void ClientChangeOnlinePerson(string needAdd)
+        /// <param name="msgModel"></param>
+        private void ClientChangeOnlinePerson(MsgModel msgModel)
         {
-            OnlinePerson += needAdd;
+            onlineClientUid.Add(msgModel.Uid);
+            OnlinePerson = string.Join(Environment.NewLine, onlineClientUid);
         }
         /// <summary>
         /// 客户端修改页面信息
@@ -119,7 +122,12 @@ namespace EasyChat.ViewModel
                 // 先清空当前在线客户端的信息
                 OnlinePerson = "";
                 // 询问在线的机子
-                myClient.sendMsg(MqttContent.WHO_ONLINE, clientUID);
+                myClient.sendMsg(MqttContent.WHO_ONLINE, new MsgModel()
+                {
+                    Uid = clientUID,
+                    SendTime = DateTime.Now,
+                    NickName = nickName,
+                });
             });
 
             #region 消息推送，接收
@@ -131,7 +139,14 @@ namespace EasyChat.ViewModel
                     {
                         Task.Run(() =>
                         {
-                            myClient.sendMsg(MqttContent.MESSAGE + SendTopic, SendMsg);
+                            myClient.sendMsg(MqttContent.MESSAGE + SendTopic, 
+                                new MsgModel()
+                                {
+                                    Uid = clientUID,
+                                    SendTime = DateTime.Now,
+                                    Msg = SendMsg,
+                                    NickName = nickName
+                                });
                             SendMsg = "";
                         });
                     }
@@ -159,11 +174,11 @@ namespace EasyChat.ViewModel
                         if (myClient.subTopics.Remove(MqttContent.MESSAGE + clientUID))
                         {
                             //取消订阅原来自己名字
-                            myClient.mqttClient.UnsubscribeAsync(MqttContent.MESSAGE + clientUID);
+                            //myClient.mqttClient.UnsubscribeAsync(MqttContent.MESSAGE + clientUID);
                             // 改名后告诉其他订阅过自己原来消息的客户端
-                            clientUID = SubscribeUid;
+                            nickName = SubscribeUid;
                             myClient.ChangeClientUid(clientUID);
-                            myClient.SubOnlineServer(MqttContent.MESSAGE + clientUID);
+                            //myClient.SubOnlineServer(MqttContent.MESSAGE + clientUID);
                             MessageBox.Show("昵称修改成功");
                         }
                     });

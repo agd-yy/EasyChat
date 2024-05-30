@@ -4,7 +4,7 @@ using System.Windows.Input;
 namespace EasyChat.ViewModel
 {
     /// <summary>
-    /// 窗口相关
+    /// 图标相关
     /// </summary>
     public class NotifyIconViewModel:BaseViewModel
     {

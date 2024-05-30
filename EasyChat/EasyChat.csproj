@@ -74,6 +74,9 @@
     <Reference Include="MQTTnet, Version=3.1.2.0, Culture=neutral, PublicKeyToken=b69712f52770c0a7, processorArchitecture=MSIL">
       <HintPath>..\packages\MQTTnet.3.1.2\lib\net452\MQTTnet.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -94,8 +97,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppIcon\NotifyIconHandle.cs" />
     <Compile Include="Handle\MsgHandle.cs" />
-    <Compile Include="Handle\ReturnModel.cs" />
+    <Compile Include="Handle\MsgModel.cs" />
     <Compile Include="Handle\UserHandle.cs" />
     <Compile Include="mqtt\MqttServer.cs" />
     <Compile Include="mqtt\MyMqttClient.cs" />
@@ -105,7 +109,14 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MqttContent.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="view\MyMsgBox.xaml.cs">
+      <DependentUpon>MyMsgBox.xaml</DependentUpon>
+    </Compile>
+    <Page Include="view\Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -113,10 +124,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="view\Login.xaml.cs">
+      <DependentUpon>Login.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="view\MyMsgBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -147,7 +165,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="favicon.ico" />
+    <Resource Include="source\favicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="1.ico" />
@@ -163,6 +181,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="source\login.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

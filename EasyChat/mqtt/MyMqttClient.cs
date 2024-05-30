@@ -1,14 +1,18 @@
+using EasyChat.Handle;
 using EasyChat.ViewModel;
+using Hardcodet.Wpf.TaskbarNotification;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace EasyChat.MQTT
 {
@@ -24,7 +28,7 @@ namespace EasyChat.MQTT
 
         // 页面事件
         public event Action<string> ReceiveMsgEvent;
-        public event Action<string> OnlinePersonEvent;
+        public event Action<MsgModel> OnlinePersonEvent;
 
         private MyMqttClient()
         {
@@ -136,14 +140,14 @@ namespace EasyChat.MQTT
         /// 发送消息
         /// </summary>
         /// <param name="topic">主题</param>
-        /// <param name="msgstr">消息</param>
+        /// <param name="msgModel">消息</param>
         /// <param name="clientUID">昵称</param>
-        public async void sendMsg(string topic, string msgstr)
+        public async void sendMsg(string topic, MsgModel msgModel)
         {
             // 发布消息
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
-                .WithPayload(msgstr + MqttContent.SUB_STRING + myClientUID)
+                .WithPayload(JsonConvert.SerializeObject(msgModel))
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
                 .WithRetainFlag()
                 .Build();
@@ -156,39 +160,56 @@ namespace EasyChat.MQTT
             // 全局消息
             if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
             {
-                var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var ReceiveMsgStr = $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {person}{Environment.NewLine}";
-                ReceiveMsgStr += $">> {msg}{Environment.NewLine}";
+                // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
+                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var ReceiveMsgStr = $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
+                ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
                 ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
-                MessageBox.Show("有全体消息啦！");
-            }
+                //MessageBox.Show("有全体消息啦！");
+                new RelayCommand(_ =>
+                {
+                    return true;
+                }, _ =>
+                {
+                    var taskbarIcon = App._taskbar;
+                    taskbarIcon.ToolTipText = "有全体消息啦！";
+                });
+
+        }
             // 收到其他客户端询问在线的机子
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.WHO_ONLINE))
             {
-                var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                if (!myClientUID.Equals(person))
+                // _ = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
+                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                if (!myClientUID.Equals(msgModel.Uid))
                 {
                     // 发送本机在线
-                    sendMsg(MqttContent.ONLINE, myClientUID);
+                    sendMsg(MqttContent.ONLINE, new MsgModel() {
+                        Uid = myClientUID,
+                        SendTime = DateTime.Now,
+                        NickName = msgModel.NickName,
+                    });
                 }
             }
             // 收到其他客户端在线消息
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
             {
-                var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                if (!myClientUID.Equals(person))
+                // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
+                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                if (!myClientUID.Equals(msgModel.Uid))
                 {
-                    OnlinePersonEvent?.Invoke($"{person}{Environment.NewLine}");
+                    OnlinePersonEvent?.Invoke(msgModel);
                 }
             }
             //其他客户端指定消息
             else if (args.ApplicationMessage.Topic.Contains(myClientUID))
             {
-                var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var ReceiveMsgStr = $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {person}{Environment.NewLine}";
-                ReceiveMsgStr += $">> {msg}{Environment.NewLine}";
+                // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
+                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var ReceiveMsgStr = $">> {msgModel.SendTime.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
+                ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
                 ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
-                MessageBox.Show("有您的指名消息❤~");
+                //MessageBox.Show("有您的指名消息❤~");
             }
         }
     }

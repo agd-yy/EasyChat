@@ -6,11 +6,13 @@
     xmlns:tb="http://www.hardcodet.net/taskbar"
     xmlns:vm="clr-namespace:EasyChat.ViewModel"
     ShutdownMode="OnExplicitShutdown"
-    StartupUri="MainWindow.xaml">
+    StartupUri="/view/Login.xaml">
     <Application.Resources>
         <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
             <MenuItem Command="{Binding ShowWindowCommand}" Header="显示窗口" />
             <!--<MenuItem Command="{Binding HideWindowCommand}" Header="关闭窗口" />-->
+            <Separator />
+            <MenuItem Command="{Binding ExitApplicationCommand}" Header="启动隐藏功能" />
             <Separator />
             <MenuItem Command="{Binding ExitApplicationCommand}" Header="退出" />
         </ContextMenu>
@@ -18,8 +20,8 @@
             x:Key="Taskbar"
             ContextMenu="{StaticResource SysTrayMenu}"
             DoubleClickCommand="{Binding ShowWindowCommand}"
-            IconSource="favicon.ico"
-            ToolTipText="2002年的第一场雪">
+            IconSource="/source/favicon.ico"
+            ToolTipText="没有新消息~">
             <tb:TaskbarIcon.DataContext>
                 <vm:NotifyIconViewModel />
             </tb:TaskbarIcon.DataContext>

@@ -21,15 +21,15 @@
             Grid.Row="0"
             Margin="20,2"
             Orientation="Horizontal">
-            <Label Content="当前用户:" />
+            <Label Content="当前用户名:" />
             <TextBox
                 Width="300"
                 Margin="0,2"
-                Text="{Binding SubscribeTopic, Mode=TwoWay}" />
+                Text="{Binding SubscribeUid, Mode=TwoWay}" />
             <Button
                 Margin="20,2"
                 Command="{Binding SubscribeCommand}"
-                Content="切换" />
+                Content="重命名" />
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <GroupBox Margin="10" Header="消息文本">
