@@ -1,0 +1,9 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/.vs/EasyChat
+/EasyChat/bin/Debug
+/EasyChat/obj/Debug
+/EasyChat/.vs
+/packages/Newtonsoft.Json.13.0.3
