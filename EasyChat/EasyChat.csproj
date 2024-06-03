@@ -100,19 +100,35 @@
     <Compile Include="AppIcon\NotifyIconHandle.cs" />
     <Compile Include="Handle\MsgHandle.cs" />
     <Compile Include="Handle\MsgModel.cs" />
+    <Compile Include="Handle\PasswordBoxHelper.cs" />
     <Compile Include="Handle\UserHandle.cs" />
     <Compile Include="mqtt\MqttServer.cs" />
     <Compile Include="mqtt\MyMqttClient.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="SingletonUtils.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MqttContent.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />
+    <Compile Include="view\Login1.xaml.cs">
+      <DependentUpon>Login1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\Login2.xaml.cs">
+      <DependentUpon>Login2.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\MyMsgBox.xaml.cs">
       <DependentUpon>MyMsgBox.xaml</DependentUpon>
     </Compile>
     <Page Include="view\Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\Login1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\Login2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

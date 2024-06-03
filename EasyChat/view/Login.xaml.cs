@@ -1,10 +1,15 @@
-﻿using MQTT_Server;
+﻿
 using System.Net.Sockets;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Media3D;
+using System.Windows.Media.Animation;
+using System;
+using EasyChat.ViewModel;
+using MQTT_Server;
+using System.Text.RegularExpressions;
 
 namespace EasyChat.view
 {
@@ -13,31 +18,60 @@ namespace EasyChat.view
     /// </summary>
     public partial class Login : Window
     {
+        // 页面绑定对象
+        private LoginViewModel loginView;
         public Login()
         {
             InitializeComponent();
+            loginView = new LoginViewModel();
+            this.DataContext = loginView;
+            Login1.DataContext = loginView;
+            Login2.DataContext = loginView;
         }
+        // 用来判断服务端是否为本地IP
         private string serviceIp;
 
+        private void MyUserControl_ButtonClicked(object sender, RoutedEventArgs e)
+        {
+            // 附加登录控件的按钮点击事件
+            if (e.OriginalSource is Button button)
+            {
+                switch (button.Name)
+                {
+                    case "MinimizeButton":
+                        MinimizeButton_Click(sender, e);
+                        break;
+                    case "BackButton":
+                        BackButton_Click(sender, e);
+                        break;
+                    case "CloseButton":
+                        CloseButton_Click(sender, e);
+                        break;
+                    case "ServerButton":
+                        ServerButton_Click(sender, e);
+                        break;
+                    case "ClientButton":
+                        ClientButton_Click(sender, e);
+                        break;
+                    case "LoginButton":
+                        LoginButton_Click(sender, e);
+                        break;
+                }
+            }
+        }
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            ServerIpTextBlock.Visibility = Visibility.Collapsed;
-            ServerIpTextBox.Visibility = Visibility.Collapsed;
-            LoginButton.Visibility = Visibility.Collapsed;
-            ServerIpTextBox.IsEnabled = true;
-            ServerIpTextBox.Text = "";
+            DoubleAnimation da = new DoubleAnimation
+            {
+                Duration = new Duration(TimeSpan.FromSeconds(1)),
+                To = 0d
+            };
+            this.axr.BeginAnimation(AxisAngleRotation3D.AngleProperty, da);
 
-            UsernameTextBox.Visibility = Visibility.Visible;
-            UsernameTextBlock.Visibility = Visibility.Visible;
-            PasswordTextBlock.Visibility = Visibility.Visible;
-            PasswordBox.Visibility = Visibility.Visible;
-            ServerButton.Visibility = Visibility.Visible;
-            ClientButton.Visibility = Visibility.Visible;
-            BackButton.Visibility = Visibility.Collapsed;
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -45,9 +79,9 @@ namespace EasyChat.view
         }
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string username = UsernameTextBox.Text;
-            string password = PasswordBox.Password;
-            string ip = ServerIpTextBox.Text;
+            string username = loginView.UserName;
+            string password = loginView.Password;
+            string ip = loginView.IpAddr;
             string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
             if (string.IsNullOrEmpty(ip) || !Regex.IsMatch(ip, pattern))
             {
@@ -58,9 +92,7 @@ namespace EasyChat.view
             {
                 MqttService.CreateMqttService();
             }
-            // Here you would typically check the username and password
-            // For simplicity, we assume the login is always successful
-
+            // TODO  username password ip
             MainWindow mainWindow = new MainWindow();
             mainWindow.Show();
             this.Close();
@@ -69,20 +101,12 @@ namespace EasyChat.view
         // 服务端按钮的处理逻辑
         private void ServerButton_Click(object sender, RoutedEventArgs e)
         {
-
-            // 显示 IP 地址输入框和登录按钮
-            ServerIpTextBlock.Visibility = Visibility.Visible;
-            ServerIpTextBox.Visibility = Visibility.Visible;
-            ServerIpTextBox.IsEnabled = false;
-            LoginButton.Visibility = Visibility.Visible;
-
-            UsernameTextBox.Visibility = Visibility.Collapsed;
-            UsernameTextBlock.Visibility = Visibility.Collapsed;
-            PasswordTextBlock.Visibility = Visibility.Collapsed;
-            PasswordBox.Visibility = Visibility.Collapsed;
-            ServerButton.Visibility = Visibility.Collapsed;
-            ClientButton.Visibility = Visibility.Collapsed;
-            BackButton.Visibility = Visibility.Visible;
+            DoubleAnimation da = new DoubleAnimation
+            {
+                Duration = new Duration(TimeSpan.FromSeconds(1)),
+                To = 180d
+            };
+            this.axr.BeginAnimation(AxisAngleRotation3D.AngleProperty, da);
 
             string ipAddress = string.Empty;
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -95,29 +119,27 @@ namespace EasyChat.view
                 }
             }
             serviceIp = ipAddress;
-            ServerIpTextBox.Text = ipAddress;
+            loginView.IpAddr = ipAddress;
+            Login2.ServerIpTextBox.IsEnabled = false;
         }
 
         // 客户端按钮的处理逻辑
         private void ClientButton_Click(object sender, RoutedEventArgs e)
         {
             // 显示 IP 地址输入框和登录按钮
-            ServerIpTextBlock.Visibility = Visibility.Visible;
-            ServerIpTextBox.Visibility = Visibility.Visible;
-            ServerIpTextBox.IsEnabled = true;
-            LoginButton.Visibility = Visibility.Visible;
-
-            UsernameTextBox.Visibility = Visibility.Collapsed;
-            UsernameTextBlock.Visibility = Visibility.Collapsed;
-            PasswordTextBlock.Visibility = Visibility.Collapsed;
-            PasswordBox.Visibility = Visibility.Collapsed;
-            ServerButton.Visibility = Visibility.Collapsed;
-            ClientButton.Visibility = Visibility.Collapsed;
-            BackButton.Visibility = Visibility.Visible;
+            DoubleAnimation da = new DoubleAnimation
+            {
+                Duration = new Duration(TimeSpan.FromSeconds(1)),
+                To = 180d
+            };
+            this.axr.BeginAnimation(AxisAngleRotation3D.AngleProperty, da);
+            loginView.IpAddr = string.Empty;
+            Login2.ServerIpTextBox.IsEnabled = true;
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // 鼠标左键拖拽
             if (e.ButtonState == MouseButtonState.Pressed)
             {
                 DragMove();

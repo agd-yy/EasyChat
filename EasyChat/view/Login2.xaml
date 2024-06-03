@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="EasyChat.view.Login2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        mc:Ignorable="d" 
+        Height="350" Width="600"  Background="Transparent">
+    <Grid>
+        <Border  CornerRadius="20" BorderBrush="Pink" BorderThickness="2" Padding="20">
+            <Border.Background>
+                <ImageBrush ImageSource="/source/login.png" Stretch="UniformToFill"/>
+            </Border.Background>
+            <Grid VerticalAlignment="Top" HorizontalAlignment="Right">
+                <!-- Custom Window Buttons -->
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="BackButton" Content="&lt;"  Width="30" Height="30" Click="BackButton_Click"
+                        Background="Pink" Foreground="White" FontWeight="Bold" HorizontalAlignment="Left" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="MinimizeButton" Content="-" Width="30" Height="30" 
+                        Background="Pink" Foreground="White" FontWeight="Bold" Click="MinimizeButton_Click"/>
+                        <Button x:Name="CloseButton" Content="X"  Width="30" Height="30" 
+                        Background="Pink" Foreground="White" FontWeight="Bold" Click="CloseButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+            <!-- Logo -->
+            <TextBlock Text="Easy" Foreground="White" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0"/>
+
+            <TextBlock x:Name="ServerIpTextBlock" Text="Server IP:" Foreground="DarkSlateGray" Margin="0,0,0,5" FontSize="14" FontWeight="Bold" />
+            <TextBox Text="{Binding IpAddr, UpdateSourceTrigger=PropertyChanged}" x:Name="ServerIpTextBox" Margin="0,0,0,10" Padding="5" FontSize="14" />
+            <Button x:Name="LoginButton" Content="Login"  Width="100" Height="30" 
+                        Background="Pink" Foreground="White" FontSize="14" HorizontalAlignment="Center" Click="LoginButton_Click" />
+        </StackPanel>
+    </Grid>
+</UserControl>
