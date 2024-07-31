@@ -140,10 +140,12 @@ namespace EasyChat.MQTT
         /// <param name="clientUID">昵称</param>
         public async void sendMsg(string topic, MsgModel msgModel)
         {
+            // 消息加密
+            var msg = AesEncryptionHandle.Encrypt(JsonConvert.SerializeObject(msgModel));
             // 发布消息
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
-                .WithPayload(JsonConvert.SerializeObject(msgModel))
+                .WithPayload(msg)
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
                 .WithRetainFlag()
                 .Build();
@@ -157,7 +159,7 @@ namespace EasyChat.MQTT
             if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
             {
                 // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var msgModel = MqttContent.Json2Obj<MsgModel>(AesEncryptionHandle.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload)));
                 var ReceiveMsgStr = $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
                 ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
                 ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
@@ -176,7 +178,7 @@ namespace EasyChat.MQTT
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.WHO_ONLINE))
             {
                 // _ = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var msgModel = MqttContent.Json2Obj<MsgModel>(AesEncryptionHandle.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload)));
                 if (!myClientUID.Equals(msgModel.Uid))
                 {
                     // 发送本机在线
@@ -191,7 +193,7 @@ namespace EasyChat.MQTT
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
             {
                 // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var msgModel = MqttContent.Json2Obj<MsgModel>(AesEncryptionHandle.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload)));
                 if (!myClientUID.Equals(msgModel.Uid))
                 {
                     OnlinePersonEvent?.Invoke(msgModel);
@@ -201,7 +203,7 @@ namespace EasyChat.MQTT
             else if (args.ApplicationMessage.Topic.Contains(myClientUID))
             {
                 // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-                var msgModel = MqttContent.Json2Obj<MsgModel>(Encoding.UTF8.GetString(args.ApplicationMessage.Payload));
+                var msgModel = MqttContent.Json2Obj<MsgModel>(AesEncryptionHandle.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload)));
                 var ReceiveMsgStr = $">> {msgModel.SendTime.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
                 ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
                 ReceiveMsgEvent?.Invoke(ReceiveMsgStr);

@@ -98,6 +98,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppIcon\NotifyIconHandle.cs" />
+    <Compile Include="Handle\AesEncryptionHandle.cs" />
     <Compile Include="Handle\MsgHandle.cs" />
     <Compile Include="Handle\MsgModel.cs" />
     <Compile Include="Handle\PasswordBoxHelper.cs" />
