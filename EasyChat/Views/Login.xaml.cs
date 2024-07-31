@@ -1,5 +1,4 @@
-﻿
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,11 +6,12 @@ using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using System.Windows.Media.Animation;
 using System;
-using EasyChat.ViewModel;
+using EasyChat.ViewModels;
 using MQTT_Server;
 using System.Text.RegularExpressions;
+using EasyChat.ViewModel;
 
-namespace EasyChat.view
+namespace EasyChat.Views
 {
     /// <summary>
     /// Login.xaml 的交互逻辑
@@ -92,7 +92,9 @@ namespace EasyChat.view
             {
                 MqttService.CreateMqttService();
             }
-            // TODO  username password ip
+            UserHandle.Instance().UserName = username;
+            UserHandle.Instance().Password = password;
+            UserHandle.Instance().ServiceIp = ip;
             MainWindow mainWindow = new MainWindow();
             mainWindow.Show();
             this.Close();

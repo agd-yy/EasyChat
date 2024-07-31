@@ -1,5 +1,5 @@
 
-namespace EasyChat.ViewModel
+namespace EasyChat.ViewModels
 {
     /// <summary>
     /// 消息处理类

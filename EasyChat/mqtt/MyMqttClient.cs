@@ -1,6 +1,5 @@
 using EasyChat.Handle;
-using EasyChat.ViewModel;
-using Hardcodet.Wpf.TaskbarNotification;
+using EasyChat.ViewModels;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
@@ -11,15 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Interop;
 
 namespace EasyChat.MQTT
 {
     public class MyMqttClient:SingletonUtils<MyMqttClient>
     {
         public IMqttClient mqttClient { get; private set; }
-        private string IPAddress = "127.0.0.1";
         private int port = 1883;
         //private string IPAddress = "47.116.66.46";
         //private int port = 10087;
@@ -39,7 +35,7 @@ namespace EasyChat.MQTT
         /// </summary>
         /// <param name="clientUID"></param>
         /// <returns></returns>
-        public async void StartClient()
+        public async void StartClient(string ip)
         {
             if (string.IsNullOrEmpty(myClientUID))
             {
@@ -51,7 +47,7 @@ namespace EasyChat.MQTT
 
             // 配置Mqtt客户端选项
             var options = new MqttClientOptionsBuilder()
-                .WithTcpServer(IPAddress, port) // 设置MQTT服务器地址和端口
+                .WithTcpServer(ip, port) // 设置MQTT服务器地址和端口
                 .WithClientId(myClientUID)
                 .WithCredentials("admin", "123456")// 设置用户名密码
                 .Build();

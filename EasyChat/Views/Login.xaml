@@ -1,7 +1,7 @@
-﻿<Window x:Class="EasyChat.view.Login"
+﻿<Window x:Class="EasyChat.Views.Login"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:EasyChat.view"
+        xmlns:local="clr-namespace:EasyChat.Views"
         Title="LoginWindow" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" 
         Height="350" Width="600" WindowStartupLocation="CenterScreen" Background="Transparent"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">

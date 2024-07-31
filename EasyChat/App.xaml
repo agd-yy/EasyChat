@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:EasyChat"
     xmlns:tb="http://www.hardcodet.net/taskbar"
-    xmlns:vm="clr-namespace:EasyChat.ViewModel"
+    xmlns:vm="clr-namespace:EasyChat.ViewModels"
     ShutdownMode="OnExplicitShutdown"
-    StartupUri="/view/Login.xaml">
+    StartupUri="/Views/Login.xaml">
     <Application.Resources>
         <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
             <MenuItem Command="{Binding ShowWindowCommand}" Header="显示窗口" />

@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace EasyChat.ViewModel
+namespace EasyChat.ViewModels
 {
     /// <summary>
     /// 图标相关

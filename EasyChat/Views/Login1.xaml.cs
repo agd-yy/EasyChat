@@ -1,14 +1,15 @@
-﻿using System.Windows;
+﻿
+using System.Windows;
 using System.Windows.Controls;
 
-namespace EasyChat.view
+namespace EasyChat.Views
 {
     /// <summary>
-    /// Login2.xaml 的交互逻辑
+    /// Login1.xaml 的交互逻辑
     /// </summary>
-    public partial class Login2 : UserControl
+    public partial class Login1 : UserControl
     {
-        public Login2()
+        public Login1()
         {
             InitializeComponent();
         }
@@ -19,16 +20,17 @@ namespace EasyChat.view
         {
             ButtonClicked?.Invoke(this, e);
         }
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            ButtonClicked?.Invoke(this, e);
-        }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             ButtonClicked?.Invoke(this, e);
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private void ServerButton_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonClicked?.Invoke(this, e);
+        }
+
+        private void ClientButton_Click(object sender, RoutedEventArgs e)
         {
             ButtonClicked?.Invoke(this, e);
         }

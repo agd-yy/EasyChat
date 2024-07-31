@@ -1,5 +1,6 @@
 using EasyChat.Handle;
 using EasyChat.MQTT;
+using EasyChat.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace EasyChat.ViewModel
+namespace EasyChat.ViewModels
 {
     public class MainViewModel:SingletonUtils<MainViewModel>,INotifyPropertyChanged
     {
@@ -23,11 +24,12 @@ namespace EasyChat.ViewModel
         private MainViewModel()
         {
             // 客户端名绑定界面
-            nickName = clientUID;
+            nickName = string.IsNullOrEmpty(UserHandle.Instance().UserName) ? clientUID : UserHandle.Instance().UserName;
             SubscribeUid = nickName;
             //启动客户端
             myClient.ChangeClientUid(clientUID);
-            myClient.StartClient();
+            myClient.StartClient(UserHandle.Instance().ServiceIp);
+
             myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
             myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
 

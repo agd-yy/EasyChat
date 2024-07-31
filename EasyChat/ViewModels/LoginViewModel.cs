@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace EasyChat.ViewModel
+namespace EasyChat.ViewModels
 {
     public class LoginViewModel : SingletonUtils<LoginViewModel>, INotifyPropertyChanged
     {

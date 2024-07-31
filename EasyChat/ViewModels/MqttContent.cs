@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace EasyChat.ViewModel
+namespace EasyChat.ViewModels
 {
     /// <summary>
     /// MQTT 静态常量类
