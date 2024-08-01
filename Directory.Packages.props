@@ -1,10 +1,14 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0"/>
-        <PackageVersion Include="MQTTnet" Version="3.1.2"/>
-        <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageVersion Include="Dragablz" Version="0.0.3.234" />
+    <PackageVersion Include="MQTTnet" Version="3.1.2" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="ScreenGrab" Version="1.0.1" />
+    <PackageVersion Include="WPF-UI" Version="3.0.5" />
+    <PackageVersion Include="WPF-UI.Tray" Version="3.0.5" />
+  </ItemGroup>
 </Project>

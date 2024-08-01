@@ -9,7 +9,7 @@
     <Grid>
         <Border  CornerRadius="20" BorderBrush="Pink" BorderThickness="2" Padding="20">
             <Border.Background>
-                <ImageBrush ImageSource="/source/login.png" Stretch="UniformToFill"/>
+                <ImageBrush ImageSource="/Resources/login.png" Stretch="UniformToFill"/>
             </Border.Background>
             <Grid VerticalAlignment="Top" HorizontalAlignment="Right">
                 <!-- Custom Window Buttons -->

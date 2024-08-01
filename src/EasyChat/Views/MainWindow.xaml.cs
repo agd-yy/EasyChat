@@ -1,17 +1,9 @@
-﻿using EasyChat.ViewModels;
-using System.Windows;
+﻿namespace EasyChat.Views;
 
-namespace EasyChat
+public partial class MainWindow
 {
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            this.DataContext = MainViewModel.Instance();
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
