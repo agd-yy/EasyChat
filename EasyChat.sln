@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyChat", "EasyChat\EasyChat.csproj", "{6ED688E3-DCE3-4A81-9463-9FB167237605}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyChat", "src\EasyChat\EasyChat.csproj", "{6ED688E3-DCE3-4A81-9463-9FB167237605}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,5 +26,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9FE743F5-542A-4491-9A2E-5C8DF1A6A8BE}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6ED688E3-DCE3-4A81-9463-9FB167237605} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
 	EndGlobalSection
 EndGlobal

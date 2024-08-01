@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>1.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" />
+        <PackageReference Include="MQTTnet" />
+        <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="1.ico" />
+      <Resource Include="source\favicon.ico" />
+      <Resource Include="source\login.png" />
+    </ItemGroup>
+
+</Project>
