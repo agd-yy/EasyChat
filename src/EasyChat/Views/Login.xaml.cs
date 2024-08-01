@@ -7,8 +7,8 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
 using EasyChat.Models;
+using EasyChat.Service;
 using EasyChat.ViewModels;
-using MQTT_Server;
 
 namespace EasyChat.Views;
 

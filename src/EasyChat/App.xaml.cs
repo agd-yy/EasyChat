@@ -1,5 +1,5 @@
-﻿using EasyChat.Views;
-using System.Windows;
+﻿using System.Windows;
+using EasyChat.Views;
 
 namespace EasyChat;
 

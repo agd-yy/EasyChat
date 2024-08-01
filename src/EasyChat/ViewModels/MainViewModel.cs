@@ -2,7 +2,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasyChat.Models;
-using EasyChat.MQTT;
+using EasyChat.Service;
 
 namespace EasyChat.ViewModels;
 

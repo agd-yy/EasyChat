@@ -2,7 +2,7 @@ using System.Text;
 using MQTTnet;
 using MQTTnet.Server;
 
-namespace MQTT_Server;
+namespace EasyChat.Service;
 
 public class MqttService
 {
@@ -75,7 +75,6 @@ public class MqttService
             await mqttServer.StartAsync(options);
 
             Console.WriteLine("服务器启动成功！直接按回车停止服务");
-            Console.ReadLine();
         }
         catch (Exception ex)
         {

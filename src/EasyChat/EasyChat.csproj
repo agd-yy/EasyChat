@@ -8,18 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" />
-        <PackageReference Include="Dragablz" />
-        <PackageReference Include="MQTTnet" />
-        <PackageReference Include="Newtonsoft.Json" />
-        <PackageReference Include="ScreenGrab" />
-        <PackageReference Include="WPF-UI" />
-        <PackageReference Include="WPF-UI.Tray" />
+        <PackageReference Include="CommunityToolkit.Mvvm"/>
+        <PackageReference Include="Dragablz"/>
+        <PackageReference Include="MQTTnet"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="ScreenGrab"/>
+        <PackageReference Include="WPF-UI"/>
+        <PackageReference Include="WPF-UI.Tray"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Resource Include="Resources\favicon.ico" />
-      <Resource Include="Resources\login.png" />
+        <Resource Include="Resources\favicon.ico"/>
+        <Resource Include="Resources\login.png"/>
     </ItemGroup>
 
 </Project>

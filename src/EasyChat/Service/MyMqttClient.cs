@@ -9,7 +9,7 @@ using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
 using Newtonsoft.Json;
 
-namespace EasyChat.MQTT;
+namespace EasyChat.Service;
 
 public class MyMqttClient : SingletonBase<MyMqttClient>
 {
