@@ -13,7 +13,7 @@ public static class WindowUtilities
 
     public static DoubleAnimation GetAnimation(double target, TimeSpan timeSpan)
     {
-        return new DoubleAnimation()
+        return new DoubleAnimation
         {
             Duration = new Duration(timeSpan),
             To = target

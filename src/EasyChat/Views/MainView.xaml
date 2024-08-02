@@ -6,9 +6,10 @@
                  xmlns:vm="clr-namespace:EasyChat.ViewModels"
                  xmlns:view="clr-namespace:EasyChat.Views"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="Chat"
+                 Title="EasyChat"
                  Width="800"
                  Height="450"
+                 WindowStartupLocation="CenterScreen"
                  mc:Ignorable="d">
     <Window.DataContext>
         <vm:MainViewModel />
@@ -22,7 +23,7 @@
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         <ui:TitleBar Title="Chat" />
-        <view:TrayView />
+        <view:TrayView Grid.Row="0" />
         <StackPanel Grid.Row="1"
                     Margin="20,2"
                     Orientation="Horizontal">

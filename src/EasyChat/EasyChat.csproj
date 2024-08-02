@@ -10,9 +10,10 @@
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="Dragablz"/>
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf"/>
         <PackageReference Include="MQTTnet"/>
         <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="PracticalToolkit.WPF" />
+        <PackageReference Include="PracticalToolkit.WPF"/>
         <PackageReference Include="ScreenGrab"/>
         <PackageReference Include="WPF-UI"/>
         <PackageReference Include="WPF-UI.Tray"/>
@@ -24,21 +25,21 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Update="Views\Controls\UcLogin.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
-      <Page Update="Views\Controls\UcUserInfo.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
-      <Page Update="Controls\EcMsgBox.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
+        <Page Update="Views\Controls\UcLogin.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Controls\UcUserInfo.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Controls\EcMsgBox.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 
 </Project>

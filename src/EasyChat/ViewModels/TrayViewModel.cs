@@ -7,6 +7,19 @@ namespace EasyChat.ViewModels;
 public partial class TrayViewModel : ObservableObject
 {
     [RelayCommand]
+    private void Open(Window window)
+    {
+        window.Show();
+        window.Activate();
+    }
+
+    [RelayCommand]
+    private void Hide(Window window)
+    {
+        window.Hide();
+    }
+
+    [RelayCommand]
     private void Exit()
     {
         try

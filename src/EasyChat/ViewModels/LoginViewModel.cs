@@ -1,17 +1,20 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasyChat.Controls;
 using EasyChat.Service;
 using EasyChat.Utilities;
-using EasyChat.Views;
 
 namespace EasyChat.ViewModels;
 
 public partial class LoginViewModel : ObservableObject
 {
+    [ObservableProperty] private bool isServer;
+
     /// <summary>
     ///     IP
     /// </summary>
@@ -26,26 +29,30 @@ public partial class LoginViewModel : ObservableObject
     ///     用户名
     /// </summary>
     [ObservableProperty] private string userName = string.Empty;
+    
+    [ObservableProperty] private BindingList<string>? ipList;
 
     [RelayCommand]
     private void Server(Window window)
     {
+        IsServer = true;
         if (window.GetAxr() is not { } axr)
             return;
         axr.BeginAnimation(AxisAngleRotation3D.AngleProperty,
             WindowUtilities.GetAnimation(180, TimeSpan.FromMilliseconds(500)));
-        IpAddr = NetworkUtilities.GetIp();
+        IpList = new BindingList<string>(NetworkUtilities.GetIps());
+        IpAddr = "0.0.0.0";
     }
 
     [RelayCommand]
     private void Client(Window window)
     {
+        IsServer = false;
         if (window.GetAxr() is not { } axr)
             return;
         axr.BeginAnimation(AxisAngleRotation3D.AngleProperty,
             WindowUtilities.GetAnimation(180, TimeSpan.FromMilliseconds(500)));
         IpAddr = string.Empty;
-        // Login2.ServerIpTextBox.IsEnabled = true;
     }
 
     [RelayCommand]
@@ -57,12 +64,8 @@ public partial class LoginViewModel : ObservableObject
             EcMsgBox.Show("请输入有效的IP地址");
             return;
         }
-
         MqttService.CreateMqttService();
-        var mainWindow = new MainView();
-        mainWindow.Show();
-        
-        window.Close();
+        window.DialogResult = true;
     }
 
     [RelayCommand]
@@ -84,6 +87,6 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private void Close(Window window)
     {
-        window.Close();
+        window.DialogResult = false;
     }
 }

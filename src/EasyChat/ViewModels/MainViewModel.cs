@@ -13,8 +13,8 @@ public partial class MainViewModel : ObservableObject
     private readonly string _clientUid = Guid.NewGuid().ToString();
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private readonly HashSet<string> _onlineClientUid = [];
-    private string _nickName;
     private readonly LoginViewModel loginViewModel = Singleton<LoginViewModel>.Instance;
+    private string _nickName;
 
 
     public MainViewModel()

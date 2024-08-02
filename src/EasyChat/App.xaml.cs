@@ -11,6 +11,14 @@ public partial class App
 
         // 创建主窗口
         var loginView = new LoginView();
-        loginView.Show();
+        if (loginView.ShowDialog() == true)
+        {
+            var mainWindow = new MainView();
+            mainWindow.Show();
+        }
+        else
+        {
+            Shutdown();
+        }
     }
 }

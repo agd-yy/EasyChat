@@ -13,9 +13,8 @@ namespace EasyChat.Service;
 
 public class MyMqttClient : SingletonBase<MyMqttClient>
 {
-    private string myClientUID;
-
     private readonly int port = 1883;
+    private string myClientUID;
 
     //private string IPAddress = "47.116.66.46";
     //private int port = 10087;

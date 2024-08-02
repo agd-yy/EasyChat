@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="https://github.com/zggsong/2022/xaml"
              xmlns:vm="clr-namespace:EasyChat.ViewModels"
              mc:Ignorable="d"
@@ -14,16 +15,30 @@
     </UserControl.DataContext>
     <UserControl.Resources>
         <s:BindingProxy x:Key="Vm" Data="{Binding}" />
+        <s:BindingProxy x:Key="View" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
     </UserControl.Resources>
     <tray:NotifyIcon Icon="/Resources/favicon.ico"
                      ToolTip="EasyChat">
-        <!-- IsVisibleChanged="NotifyIcon_IsVisibleChanged" -->
-        <!-- LeftClick="NotifyIcon_LeftClick" -->
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="LeftClick">
+                <i:InvokeCommandAction Command="{Binding OpenCommand}"
+                                       CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <tray:NotifyIcon.Menu>
             <ContextMenu>
-                <MenuItem Header="Settings">
+                <MenuItem Header="Show"
+                          Command="{Binding Source={StaticResource Vm}, Path=Data.OpenCommand}"
+                          CommandParameter="{Binding Source={StaticResource View}, Path=Data}">
                     <MenuItem.Icon>
-                        <ui:SymbolIcon Symbol="Settings24" />
+                        <ui:SymbolIcon Symbol="Home24" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Hide"
+                          Command="{Binding Source={StaticResource Vm}, Path=Data.HideCommand}"
+                          CommandParameter="{Binding Source={StaticResource View}, Path=Data}">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="SlideHide24" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />

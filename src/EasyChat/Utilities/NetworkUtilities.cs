@@ -5,12 +5,15 @@ namespace EasyChat.Utilities;
 
 public class NetworkUtilities
 {
-    public static string GetIp() => GetIps().FirstOrDefault() ?? "127.0.0.1";
+    private static readonly string[] AllHost = ["0.0.0.0"];
 
-    public static List<string> GetIps()
+    public static IList<string> GetIps()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
-        var ips = (from ip in host.AddressList where ip.AddressFamily == AddressFamily.InterNetwork select ip.ToString()).ToList();
-        return ips;
+        var ips =
+            (from ip in host.AddressList
+                where ip.AddressFamily == AddressFamily.InterNetwork
+                select ip.ToString()).Union(AllHost);
+        return ips.ToList();
     }
 }

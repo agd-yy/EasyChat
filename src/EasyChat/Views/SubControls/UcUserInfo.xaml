@@ -44,7 +44,8 @@
                        Margin="0,0,0,5"
                        FontSize="14" FontWeight="Bold" />
             <TextBox Margin="0,0,0,10"
-                     Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="UsernameTextBox"
+                     Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     x:Name="UsernameTextBox"
                      Padding="5"
                      FontSize="14" />
             <TextBlock Margin="0,0,0,5"
