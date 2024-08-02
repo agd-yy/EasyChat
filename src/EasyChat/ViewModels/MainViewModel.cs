@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasyChat.Models;
 using EasyChat.Service;
+using EasyChat.Utilities;
 
 namespace EasyChat.ViewModels;
 
@@ -13,16 +14,17 @@ public partial class MainViewModel : ObservableObject
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private readonly HashSet<string> _onlineClientUid = [];
     private string _nickName;
+    private readonly LoginViewModel loginViewModel = Singleton<LoginViewModel>.Instance;
 
 
     public MainViewModel()
     {
         // 客户端名绑定界面
-        _nickName = string.IsNullOrEmpty(UserHandle.Instance.UserName) ? _clientUid : UserHandle.Instance.UserName;
+        _nickName = string.IsNullOrEmpty(loginViewModel.UserName) ? _clientUid : loginViewModel.UserName;
         SubscribeUid = _nickName;
         //启动客户端
         _myClient.ChangeClientUid(_clientUid);
-        _myClient.StartClient(UserHandle.Instance.ServiceIp);
+        _myClient.StartClient(loginViewModel.IpAddr);
 
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;

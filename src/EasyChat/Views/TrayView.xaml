@@ -1,63 +1,39 @@
-﻿<Window x:Class="EasyChat.Views.TrayView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
-        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        xmlns:vm="clr-namespace:EasyChat.ViewModels"
-        mc:Ignorable="d"
-        Title="NotifyIconWindow"
-        Width="0"
-        Height="0"
-        Activated="TrayView_OnActivated"
-        Background="Transparent"
-        IsHitTestVisible="False"
-        Left="-50"
-        Opacity="0"
-        ShowInTaskbar="True"
-        ToolTip="Text Grab"
-        Top="-50"
-        WindowStyle="ToolWindow"
-        d:DesignHeight="300" d:DesignWidth="300">
-    <Window.DataContext>
+﻿<UserControl x:Class="EasyChat.Views.TrayView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:s="https://github.com/zggsong/2022/xaml"
+             xmlns:vm="clr-namespace:EasyChat.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.DataContext>
         <vm:TrayViewModel />
-    </Window.DataContext>
-    <Grid>
-        <tray:NotifyIcon x:Name="NotifyIcon"
-                         Icon="/Resources/favicon.ico"
-                         ToolTip="EasyChat">
-            <!-- IsVisibleChanged="NotifyIcon_IsVisibleChanged" -->
-            <!-- LeftClick="NotifyIcon_LeftClick" -->
-            <tray:NotifyIcon.Menu>
-                <ContextMenu>
-                    <MenuItem x:Name="SettingsMenuItem"
-                              Header="Settings">
-                        <MenuItem.Icon>
-                            <ui:SymbolIcon Symbol="Settings24" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <!-- Click="SettingsMenuItem_Click" -->
-                    <Separator />
-                    <MenuItem
-                        x:Name="LastGrabMenuItem"
-                        Header="Edit Last Grab">
-                        <MenuItem.Icon>
-                            <ui:SymbolIcon Symbol="ImageEdit24" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <!-- Click="LastGrabMenuItem_Click" -->
-                    <MenuItem x:Name="CloseMenuItem"
-                              Command="{Binding ExitCommand}"
-                              Header="Close Text Grab">
-                        <MenuItem.Icon>
-                            <ui:SymbolIcon Symbol="Dismiss24" />
-                        </MenuItem.Icon>
-                        <!-- Click="Exit_Click" -->
-                    </MenuItem>
-                </ContextMenu>
-            </tray:NotifyIcon.Menu>
-        </tray:NotifyIcon>
-
-    </Grid>
-</Window>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <s:BindingProxy x:Key="Vm" Data="{Binding}" />
+    </UserControl.Resources>
+    <tray:NotifyIcon Icon="/Resources/favicon.ico"
+                     ToolTip="EasyChat">
+        <!-- IsVisibleChanged="NotifyIcon_IsVisibleChanged" -->
+        <!-- LeftClick="NotifyIcon_LeftClick" -->
+        <tray:NotifyIcon.Menu>
+            <ContextMenu>
+                <MenuItem Header="Settings">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="Settings24" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Command="{Binding Source={StaticResource Vm}, Path=Data.ExitCommand}"
+                          Header="Exit">
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="Dismiss24" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </tray:NotifyIcon.Menu>
+    </tray:NotifyIcon>
+</UserControl>

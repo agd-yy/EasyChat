@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EasyChat.Utilities;
 
-public class EncryptUtil
+public class EncryptUtilities
 {
     // 硬编码密钥和 IV
     private const string AesKey = "WoYongYuanXiHuanSikadi_WeiSikadi"; // 32 字符

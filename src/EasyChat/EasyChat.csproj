@@ -12,6 +12,7 @@
         <PackageReference Include="Dragablz"/>
         <PackageReference Include="MQTTnet"/>
         <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="PracticalToolkit.WPF" />
         <PackageReference Include="ScreenGrab"/>
         <PackageReference Include="WPF-UI"/>
         <PackageReference Include="WPF-UI.Tray"/>
@@ -20,6 +21,19 @@
     <ItemGroup>
         <Resource Include="Resources\favicon.ico"/>
         <Resource Include="Resources\login.png"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="Views\Controls\UcLogin.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Views\Controls\UcUserInfo.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 
 </Project>

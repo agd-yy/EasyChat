@@ -135,7 +135,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     public async void sendMsg(string topic, MsgModel msgModel)
     {
         // 消息加密
-        var msg = EncryptUtil.Encrypt(JsonConvert.SerializeObject(msgModel));
+        var msg = EncryptUtilities.Encrypt(JsonConvert.SerializeObject(msgModel));
         // 发布消息
         var message = new MqttApplicationMessageBuilder()
             .WithTopic(topic)
@@ -153,7 +153,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
         {
             // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtil.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
+            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
                 .Deserialize<MsgModel>();
             var ReceiveMsgStr =
                 $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
@@ -173,7 +173,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         else if (args.ApplicationMessage.Topic.Equals(MqttContent.WHO_ONLINE))
         {
             // _ = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtil.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
+            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
                 .Deserialize<MsgModel>();
             if (!myClientUID.Equals(msgModel.Uid))
                 // 发送本机在线
@@ -188,7 +188,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
         {
             // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtil.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
+            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
                 .Deserialize<MsgModel>();
             if (!myClientUID.Equals(msgModel.Uid)) OnlinePersonEvent?.Invoke(msgModel);
         }
@@ -196,7 +196,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         else if (args.ApplicationMessage.Topic.Contains(myClientUID))
         {
             // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtil.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
+            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
                 .Deserialize<MsgModel>();
             var ReceiveMsgStr =
                 $">> {msgModel.SendTime.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
