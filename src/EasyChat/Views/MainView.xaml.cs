@@ -1,8 +1,8 @@
 ﻿namespace EasyChat.Views;
 
-public partial class MainWindow
+public partial class MainView
 {
-    public MainWindow()
+    public MainView()
     {
         InitializeComponent();
     }

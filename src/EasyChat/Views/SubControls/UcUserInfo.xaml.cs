@@ -1,4 +1,4 @@
-﻿namespace EasyChat.Views.Controls;
+﻿namespace EasyChat.Views.SubControls;
 
 public partial class UcUserInfo
 {

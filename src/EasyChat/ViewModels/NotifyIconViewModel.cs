@@ -16,11 +16,11 @@ public partial class NotifyIconViewModel : ObservableObject
     [RelayCommand]
     public void ShowWindow()
     {
-        MainWindow? old = null;
+        MainView? old = null;
         foreach (var w in Application.Current.Windows)
-            if (w is MainWindow mw)
+            if (w is MainView mw)
                 old = mw;
-        if (old == null) Application.Current.MainWindow = old = new MainWindow();
+        if (old == null) Application.Current.MainWindow = old = new MainView();
         old.Show();
     }
 

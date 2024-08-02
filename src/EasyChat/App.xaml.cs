@@ -10,7 +10,7 @@ public partial class App
         base.OnStartup(e);
 
         // 创建主窗口
-        var loginView = new Login();
+        var loginView = new LoginView();
         loginView.Show();
     }
 }

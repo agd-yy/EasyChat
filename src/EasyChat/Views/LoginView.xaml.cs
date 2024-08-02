@@ -4,9 +4,9 @@ using EasyChat.ViewModels;
 
 namespace EasyChat.Views;
 
-public partial class Login
+public partial class LoginView
 {
-    public Login()
+    public LoginView()
     {
         InitializeComponent();
         DataContext = Singleton<LoginViewModel>.Instance;

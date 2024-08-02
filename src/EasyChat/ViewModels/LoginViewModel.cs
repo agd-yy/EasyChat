@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media.Media3D;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EasyChat.Controls;
 using EasyChat.Service;
 using EasyChat.Utilities;
 using EasyChat.Views;
@@ -53,12 +54,12 @@ public partial class LoginViewModel : ObservableObject
         var pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         if (string.IsNullOrEmpty(IpAddr) || !Regex.IsMatch(IpAddr, pattern))
         {
-            MyMsgBox.Show("请输入有效的IP地址");
+            EcMsgBox.Show("请输入有效的IP地址");
             return;
         }
 
         MqttService.CreateMqttService();
-        var mainWindow = new MainWindow();
+        var mainWindow = new MainView();
         mainWindow.Show();
         
         window.Close();
