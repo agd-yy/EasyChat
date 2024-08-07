@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media.Media3D;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -29,7 +28,7 @@ public partial class LoginViewModel : ObservableObject
     ///     用户名
     /// </summary>
     [ObservableProperty] private string userName = string.Empty;
-    
+
     [ObservableProperty] private BindingList<string>? ipList;
 
     [RelayCommand]
@@ -41,7 +40,7 @@ public partial class LoginViewModel : ObservableObject
         axr.BeginAnimation(AxisAngleRotation3D.AngleProperty,
             WindowUtilities.GetAnimation(180, TimeSpan.FromMilliseconds(500)));
         IpList = new BindingList<string>(NetworkUtilities.GetIps());
-        IpAddr = "0.0.0.0";
+        IpAddr = IpList.FirstOrDefault();
     }
 
     [RelayCommand]

@@ -23,6 +23,10 @@ public static class MqttContent
     // 分割消息与用户名的字符
     public const char SUB_STRING = '$';
 
+    public const int SERVER_PORT = 1883;
+    public const string SERVER_USER = "Doctor";
+    public const string SERVER_PW = "233";
+
     // 客户端上线 发送上线主题 group/online + 自身uid
     // 同时订阅消息 group/online (获取上线客户端)； 还有 group/whoOnline(其他客户端寻求在线客户端)
     // message/# (全局消息)； message/自己UID (别人发送给自己的消息)

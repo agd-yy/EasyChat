@@ -29,4 +29,6 @@ public class MsgModel
     ///     消息体
     /// </summary>
     public string Msg { get; set; } = "";
+
+    public HashSet<string> Uids { get; set; } = [];
 }

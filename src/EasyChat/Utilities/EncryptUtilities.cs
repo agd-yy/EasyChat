@@ -17,17 +17,16 @@ public class EncryptUtilities
     /// <returns></returns>
     public static string Encrypt(string content)
     {
-        using var aes = Aes.Create();
+        using Aes aes = Aes.Create();
         aes.Key = Encoding.UTF8.GetBytes(AesKey);
         aes.IV = Encoding.UTF8.GetBytes(AesIv);
-
-        var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-        using var msEncrypt = new MemoryStream();
-        using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
-        using var swEncrypt = new StreamWriter(csEncrypt);
-        swEncrypt.Write(content);
-
+        ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+        using MemoryStream msEncrypt = new();
+        using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
+        using (StreamWriter swEncrypt = new(csEncrypt))
+        {
+            swEncrypt.Write(content);
+        }
         return Convert.ToBase64String(msEncrypt.ToArray());
     }
 

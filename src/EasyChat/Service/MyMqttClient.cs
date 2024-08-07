@@ -13,22 +13,23 @@ namespace EasyChat.Service;
 
 public class MyMqttClient : SingletonBase<MyMqttClient>
 {
-    private readonly int port = 1883;
-    private string myClientUID;
-
-    //private string IPAddress = "47.116.66.46";
-    //private int port = 10087;
-    public List<string> subTopics = new();
+    public string MyClientUID { get; private set; } = Guid.NewGuid().ToString();
+    public List<string> subTopics = [];
+    private HashSet<string> topicSet = [];
 
     private MyMqttClient()
     {
+        topicSet.Add(MqttContent.WHO_ONLINE);
+        topicSet.Add(MqttContent.ONLINE);
+        topicSet.Add(MqttContent.MESSAGE + MyClientUID);
+        topicSet.Add(MqttContent.MESSAGE_ALL);
     }
 
-    public IMqttClient mqttClient { get; private set; }
+    public IMqttClient? mqttClient { get; private set; }
 
     // 页面事件
-    public event Action<string> ReceiveMsgEvent;
-    public event Action<MsgModel> OnlinePersonEvent;
+    public event Action<string>? ReceiveMsgEvent;
+    public event Action<MsgModel>? OnlinePersonEvent;
 
     /// <summary>
     ///     启动客户端
@@ -37,16 +38,15 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     /// <returns></returns>
     public async void StartClient(string ip)
     {
-        if (string.IsNullOrEmpty(myClientUID)) return;
         // 创建Mqtt客户端工厂
         var factory = new MqttFactory();
         mqttClient = factory.CreateMqttClient();
 
         // 配置Mqtt客户端选项
         var options = new MqttClientOptionsBuilder()
-            .WithTcpServer(ip, port) // 设置MQTT服务器地址和端口
-            .WithClientId(myClientUID)
-            .WithCredentials("admin", "123456") // 设置用户名密码
+            .WithTcpServer(ip, MqttContent.SERVER_PORT) // 设置MQTT服务器地址和端口
+            .WithClientId(MyClientUID)
+            .WithCredentials(MqttContent.SERVER_USER, MqttContent.SERVER_PW) // 设置用户名密码
             .Build();
 
         try
@@ -61,7 +61,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         }
 
         // 订阅主题
-        SubTopic();
+        InitSubTopic();
         mqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(HandleMSG);
         // 重连机制
         mqttClient.UseDisconnectedHandler(async e =>
@@ -73,7 +73,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
                 await mqttClient.ConnectAsync(options);
                 if (mqttClient.IsConnected) ReceiveMsgEvent?.Invoke($">> 成功重连到服务器 {Environment.NewLine}");
                 // 重新订阅
-                SubTopic();
+                InitSubTopic();
             }
             catch
             {
@@ -83,33 +83,48 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     }
 
     /// <summary>
-    ///     修改用户昵称
-    /// </summary>
-    /// <param name="clientUID"></param>
-    public void ChangeClientUid(string clientUID)
-    {
-        myClientUID = clientUID;
-    }
-
-    /// <summary>
-    ///     订阅主题
-    /// </summary>
-    private void SubTopic()
-    {
-        // 订阅获取在线用户和询问在线用户
-        SubOnlineServer(MqttContent.WHO_ONLINE);
-        SubOnlineServer(MqttContent.ONLINE);
-        // 订阅给自身UID发消息的主题
-        SubOnlineServer(MqttContent.MESSAGE + myClientUID);
-        // 订阅全局消息，调试用
-        SubOnlineServer(MqttContent.MESSAGE_ALL);
-    }
-
-    /// <summary>
-    ///     订阅
+    /// 新增订阅主题
     /// </summary>
     /// <param name="topic"></param>
-    public async void SubOnlineServer(string topic)
+    public void AddTopic(string topic)
+    {
+        topicSet.Add(topic);
+        SubOnlineServer(topic);
+    }
+
+    /// <summary>
+    /// 取消订阅
+    /// </summary>
+    /// <param name="topic"></param>
+    public void RemoveTopic(string topic)
+    {
+        topicSet.Remove(topic);
+        try
+        {
+            mqttClient.UnsubscribeAsync(topic);
+        }
+        catch
+        {
+            // 取消订阅失败也是连接失败导致的
+        }
+    }
+
+    /// <summary>
+    /// 订阅主题
+    /// </summary>
+    private void InitSubTopic()
+    {
+        foreach (var topic in topicSet)
+        {
+            SubOnlineServer(topic);
+        }
+    }
+
+    /// <summary>
+    /// 订阅
+    /// </summary>
+    /// <param name="topic"></param>
+    private async void SubOnlineServer(string topic)
     {
         var qosLevel = 0; // QoS级别，可以是0、1或2
         try
@@ -134,7 +149,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     public async void sendMsg(string topic, MsgModel msgModel)
     {
         // 消息加密
-        var msg = EncryptUtilities.Encrypt(JsonConvert.SerializeObject(msgModel));
+        var msg = EncryptUtilities.Encrypt(msgModel.Serialize());
         // 发布消息
         var message = new MqttApplicationMessageBuilder()
             .WithTopic(topic)
@@ -146,62 +161,43 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         await mqttClient.PublishAsync(message);
     }
 
-    public void HandleMSG(MqttApplicationMessageReceivedEventArgs args)
+    private void HandleMSG(MqttApplicationMessageReceivedEventArgs args)
     {
-        // 全局消息
-        if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
+        try
         {
-            // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
             var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
                 .Deserialize<MsgModel>();
-            var ReceiveMsgStr =
-                $">> {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
-            ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
-            ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
-            //MessageBox.Show("有全体消息啦！");
-            //new RelayCommand(_ =>
-            //{
-            //    return true;
-            //}, _ =>
-            //{
-            //    var taskbarIcon = App._taskbar;
-            //    taskbarIcon.ToolTipText = "有全体消息啦！";
-            //});
+            if (msgModel == null)
+            {
+                return;
+            }
+            // 全局消息
+            if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
+            {
+                var ReceiveMsgStr =
+                     $">> {msgModel.SendTime:yyyy-MM-dd HH:mm:ss}---From {msgModel.NickName}{Environment.NewLine}";
+                ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
+                ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
+            }
+            // 收到其他客户端在线消息
+            else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
+            {
+                msgModel.Uids.Remove(MyClientUID);
+                OnlinePersonEvent?.Invoke(msgModel);
+            }
+            //其他客户端指定消息
+            else if (args.ApplicationMessage.Topic.Contains(MyClientUID))
+            {
+                var ReceiveMsgStr =
+                    $">> {msgModel.SendTime:yyyy-MM-dd HH:mm:ss}---From {msgModel.NickName}{Environment.NewLine}";
+                ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
+                ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
+                //MessageBox.Show("有您的指名消息❤~");
+            }
         }
-        // 收到其他客户端询问在线的机子
-        else if (args.ApplicationMessage.Topic.Equals(MqttContent.WHO_ONLINE))
+        catch
         {
-            // _ = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
-                .Deserialize<MsgModel>();
-            if (!myClientUID.Equals(msgModel.Uid))
-                // 发送本机在线
-                sendMsg(MqttContent.ONLINE, new MsgModel
-                {
-                    Uid = myClientUID,
-                    SendTime = DateTime.Now,
-                    NickName = msgModel.NickName
-                });
-        }
-        // 收到其他客户端在线消息
-        else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
-        {
-            // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
-                .Deserialize<MsgModel>();
-            if (!myClientUID.Equals(msgModel.Uid)) OnlinePersonEvent?.Invoke(msgModel);
-        }
-        //其他客户端指定消息
-        else if (args.ApplicationMessage.Topic.Contains(myClientUID))
-        {
-            // var msg = MsgHandle.DealMsg(Encoding.UTF8.GetString(args.ApplicationMessage.Payload), out string person);
-            var msgModel = EncryptUtilities.Decrypt(Encoding.UTF8.GetString(args.ApplicationMessage.Payload))
-                .Deserialize<MsgModel>();
-            var ReceiveMsgStr =
-                $">> {msgModel.SendTime.ToString("yyyy-MM-dd HH:mm:ss")}---From {msgModel.NickName}{Environment.NewLine}";
-            ReceiveMsgStr += $">> {msgModel.Msg}{Environment.NewLine}";
-            ReceiveMsgEvent?.Invoke(ReceiveMsgStr);
-            //MessageBox.Show("有您的指名消息❤~");
+            // 解密失败
         }
     }
 }

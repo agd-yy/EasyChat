@@ -9,21 +9,19 @@ namespace EasyChat.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    // 客户端的昵称，以后可以添加一个登录界面，这个和登录用户名绑定
-    private readonly string _clientUid = Guid.NewGuid().ToString();
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
-    private readonly HashSet<string> _onlineClientUid = [];
+
     private readonly LoginViewModel loginViewModel = Singleton<LoginViewModel>.Instance;
+    // 客户端的昵称
     private string _nickName;
 
 
     public MainViewModel()
     {
         // 客户端名绑定界面
-        _nickName = string.IsNullOrEmpty(loginViewModel.UserName) ? _clientUid : loginViewModel.UserName;
+        _nickName = string.IsNullOrEmpty(loginViewModel.UserName) ? _myClient.MyClientUID : loginViewModel.UserName;
         SubscribeUid = _nickName;
         //启动客户端
-        _myClient.ChangeClientUid(_clientUid);
         _myClient.StartClient(loginViewModel.IpAddr);
 
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
@@ -36,8 +34,11 @@ public partial class MainViewModel : ObservableObject
     /// <param name="msgModel"></param>
     private void ClientChangeOnlinePerson(MsgModel msgModel)
     {
-        _onlineClientUid.Add(msgModel.Uid);
-        OnlinePerson = string.Join(Environment.NewLine, _onlineClientUid);
+        if (msgModel == null)
+        {
+            return;
+        }
+        OnlinePerson = string.Join(Environment.NewLine, msgModel.Uids);
     }
 
     /// <summary>
@@ -61,7 +62,7 @@ public partial class MainViewModel : ObservableObject
                     _myClient.sendMsg(MqttContent.MESSAGE + SendTopic,
                         new MsgModel
                         {
-                            Uid = _clientUid,
+                            Uid = _myClient.MyClientUID,
                             SendTime = DateTime.Now,
                             Msg = SendMsg,
                             NickName = _nickName
@@ -90,16 +91,8 @@ public partial class MainViewModel : ObservableObject
                     return;
                 }
 
-                if (_myClient.subTopics.Remove(MqttContent.MESSAGE + _clientUid))
-                {
-                    //取消订阅原来自己名字
-                    //myClient.mqttClient.UnsubscribeAsync(MqttContent.MESSAGE + clientUID);
-                    // 改名后告诉其他订阅过自己原来消息的客户端
-                    _nickName = SubscribeUid;
-                    _myClient.ChangeClientUid(_clientUid);
-                    //myClient.SubOnlineServer(MqttContent.MESSAGE + clientUID);
-                    MessageBox.Show("昵称修改成功");
-                }
+                _nickName = SubscribeUid;
+                MessageBox.Show("昵称修改成功");
             });
         }
         catch (Exception ex)
@@ -116,7 +109,7 @@ public partial class MainViewModel : ObservableObject
         // 询问在线的机子
         _myClient.sendMsg(MqttContent.WHO_ONLINE, new MsgModel
         {
-            Uid = _clientUid,
+            Uid = _myClient.MyClientUID,
             SendTime = DateTime.Now,
             NickName = _nickName
         });

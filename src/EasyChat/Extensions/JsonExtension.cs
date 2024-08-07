@@ -4,7 +4,7 @@ namespace EasyChat.Extensions;
 
 public static class JsonExtension
 {
-    public static string? Serialize(this object obj)
+    public static string Serialize(this object obj)
     {
         try
         {
@@ -12,7 +12,7 @@ public static class JsonExtension
         }
         catch (Exception)
         {
-            return default;
+            return string.Empty;
         }
     }
 
