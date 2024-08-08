@@ -7,7 +7,6 @@ using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
-using Newtonsoft.Json;
 
 namespace EasyChat.Service;
 

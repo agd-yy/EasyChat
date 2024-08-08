@@ -8,20 +8,59 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm"/>
-        <PackageReference Include="Dragablz"/>
-        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf"/>
-        <PackageReference Include="MQTTnet"/>
-        <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="PracticalToolkit.WPF"/>
-        <PackageReference Include="ScreenGrab"/>
-        <PackageReference Include="WPF-UI"/>
-        <PackageReference Include="WPF-UI.Tray"/>
+      <Compile Remove="Controls\MenuButton.xaml.cs" />
+      <Compile Remove="Views\ChatView.xaml.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\favicon.ico"/>
-        <Resource Include="Resources\login.png"/>
+      <None Remove="Resources\Images\p1.jpg" />
+      <None Remove="Resources\Images\p10.jpg" />
+      <None Remove="Resources\Images\p11.jpg" />
+      <None Remove="Resources\Images\p12.jpg" />
+      <None Remove="Resources\Images\p2.jpg" />
+      <None Remove="Resources\Images\p3.jpg" />
+      <None Remove="Resources\Images\p4.jpg" />
+      <None Remove="Resources\Images\p5.jpg" />
+      <None Remove="Resources\Images\p6.jpg" />
+      <None Remove="Resources\Images\p7.jpg" />
+      <None Remove="Resources\Images\p8.jpg" />
+      <None Remove="Resources\Images\p9.jpg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Remove="Controls\MenuButton.xaml" />
+      <Page Remove="Views\ChatView.xaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" />
+        <PackageReference Include="Dragablz" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Core" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Material" />
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
+        <PackageReference Include="MQTTnet" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="PracticalToolkit.WPF" />
+        <PackageReference Include="ScreenGrab" />
+        <PackageReference Include="WPF-UI" />
+        <PackageReference Include="WPF-UI.Tray" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\favicon.ico" />
+        <Resource Include="Resources\Images\p1.jpg" />
+        <Resource Include="Resources\Images\p10.jpg" />
+        <Resource Include="Resources\Images\p11.jpg" />
+        <Resource Include="Resources\Images\p12.jpg" />
+        <Resource Include="Resources\Images\p2.jpg" />
+        <Resource Include="Resources\Images\p3.jpg" />
+        <Resource Include="Resources\Images\p4.jpg" />
+        <Resource Include="Resources\Images\p5.jpg" />
+        <Resource Include="Resources\Images\p6.jpg" />
+        <Resource Include="Resources\Images\p7.jpg" />
+        <Resource Include="Resources\Images\p8.jpg" />
+        <Resource Include="Resources\Images\p9.jpg" />
+        <Resource Include="Resources\login.png" />
     </ItemGroup>
 
     <ItemGroup>

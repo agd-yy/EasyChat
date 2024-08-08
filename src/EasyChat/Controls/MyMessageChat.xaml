@@ -1,0 +1,10 @@
+﻿<UserControl x:Class="EasyChat.Controls.MyMessageChat"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Name="myMessageChat">
+
+    <Border CornerRadius="10 0 10 10" Background="#f8f7fc" Padding="10 7" HorizontalAlignment="Right" Margin="0 5 0 0">
+        <TextBlock Text="{Binding ElementName=myMessageChat,Path=Message}" FontSize="14" Foreground="#94939a" VerticalAlignment="Center" Margin="3 0 3 2"/>
+    </Border>
+    
+</UserControl>

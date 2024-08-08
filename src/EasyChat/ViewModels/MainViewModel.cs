@@ -121,6 +121,12 @@ public partial class MainViewModel : ObservableObject
         ReceiveMsg = "";
     }
 
+    [RelayCommand]
+    private void Enter()
+    {
+        Send();
+    }
+
     #region Property
 
     /// <summary>
