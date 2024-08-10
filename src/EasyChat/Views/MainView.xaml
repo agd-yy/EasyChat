@@ -29,6 +29,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Grid>
+            <view:TrayView Grid.Row="0" />
+        </Grid>
         <!--background-->
         <Border CornerRadius="0 20 20 0" Background="#f8f7fc" Grid.Column="1" Grid.ColumnSpan="2" Margin="-25 0 0 0" Grid.RowSpan="2" MouseDown="Border_MouseDown" MouseLeftButtonDown="Boreder_MouseLeftButtonDown"/>
 
@@ -45,15 +48,10 @@
 
                 <!--account buttons-->
                 <StackPanel Margin="0 170 0 0">
-                    <uc:AccountMenuButton Title="A" GradientColor1="#d1abff" GradientColor2="#b07bff"/>
-                    <uc:AccountMenuButton Title="A" GradientColor1="#fba0cb" GradientColor2="#fe7094"/>
-                    <uc:AccountMenuButton Title="A" GradientColor1="#e5db6f" GradientColor2="#e2c649"/>
-
                     <!--add button-->
-                    <Button Style="{StaticResource leftSideButton}">
+                    <Button Style="{StaticResource leftSideButton}" Command = "{Binding NothingCommand}">
                         <Border Background="Transparent" CornerRadius="3" Width="25" Height="25" BorderThickness="0.8"
                             Margin="-3 0 0 0" BorderBrush="White">
-
                             <Icon:PackIconMaterial Kind="Plus" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                     </Button>
@@ -65,38 +63,27 @@
         <Grid Grid.Column="1" Grid.ColumnSpan="2" Margin="40 30">
             <!--search textbox-->
             <Grid Width="250"   HorizontalAlignment="Left">
-                <ComboBox Style="{StaticResource ComboBoxStyle2}" HorizontalAlignment="Left" Margin="3 0 0 0" Panel.ZIndex="2">
-                    <ComboBoxItem Content="All Category" IsSelected="True"/>
-                    <ComboBoxItem Content="Books"/>
-                    <ComboBoxItem Content="Cars"/>
-                    <ComboBoxItem Content="Plants"/>
-                </ComboBox>
-
                 <Rectangle Width="1" Fill="#e9e9e9" Panel.ZIndex="2" HorizontalAlignment="Left" Margin="130 19 0 19"/>
-
                 <TextBlock Margin="150 0 20 0" VerticalAlignment="Center" Foreground="#868686" Panel.ZIndex="1"
                        IsHitTestVisible="False" Text="Search here ..." 
                        Visibility="{Binding ElementName=txtboxSearch,Converter={StaticResource BoolTovis}}"/>
-
                 <TextBox x:Name="txtboxSearch" Style="{StaticResource searchTextbox}"/>
-
-                <Button HorizontalAlignment="Right" Margin="0 0 7 0" Style="{StaticResource textBoxButton}">
+                <Button HorizontalAlignment="Right" Margin="0 0 7 0" Style="{StaticResource textBoxButton}"
+                       Command = "{Binding NothingCommand}">
                     <Icon:PackIconMaterial Kind="Magnify" Width="15" Foreground="#c7c7c7"/>
                 </Button>
             </Grid>
 
             <!--top menu-->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource textBoxButton}">
-                    <Icon:PackIconMaterial Kind="BellOutline" Foreground="#88878e"/>
+                <Button Style="{StaticResource textBoxButton}" Click="Minimize">
+                    <Icon:PackIconMaterial Kind="WindowMinimize" Foreground="#88878e"/>
                 </Button>
-
-                <Button Style="{StaticResource textBoxButton}" Background="#e9e9e9" >
-                    <Icon:PackIconMaterial Kind="AccountArrowLeftOutline" Foreground="#88878e"/>
+                <Button Style="{StaticResource textBoxButton}" Click="Maximize">
+                    <Icon:PackIconMaterial Kind="WindowMaximize" Foreground="#88878e"/>
                 </Button>
-
-                <Button Style="{StaticResource textBoxButton}">
-                    <Icon:PackIconMaterial Kind="DotsVertical" Foreground="#88878e"/>
+                <Button Style="{StaticResource textBoxButton}" Click="OnClose">
+                    <Icon:PackIconMaterial Kind ="Close"  Foreground="#88878e"/>
                 </Button>
             </StackPanel>
         </Grid>
@@ -111,30 +98,23 @@
 
                 <!--group items-->
                 <StackPanel Margin="30 0 15 0">
-                    <TextBlock Text="Groups" Margin="25 0 0 5" Style="{StaticResource titleText}"/>
-                    <uc:Item Title="Para Habib" Message="Okey,Cool!" Color="#73afff" TagName="PH" MessageCount="2" Image="/Resources/Images/p5.jpg"/>
-                    <uc:Item Title="Moonlab Std" Message="I'm Waiting for Maud for com..." Color="#8387ec" TagName="MS" Image="/Resources/Images/p6.jpg"/>
-                    <uc:Item Title="Omah Guyup" Message="Thanks! im going forward" Color="#ffad2c" TagName="OG" MessageCount="6" Image="/Resources/Images/p7.jpg"/>
-                    <uc:Item Title="Sugih Manteb" Message="Thank you" Color="#ff7195" TagName="SM" MessageCount="1" Image="/Resources/Images/p8.jpg"/>
-                    <uc:Item Title="Bakul Mac" Message="Grateful thoughts" Color="#5ac795" TagName="BM" MessageCount="1" Image="/Resources/Images/p9.jpg"/>
-
-                    <Button Content="Show All" Style="{StaticResource showBoxButton}"/>
-
-                    <TextBlock Text="Persons" Margin="25 15 0 5" Style="{StaticResource titleText}"/>
-
-                    <!--person Items-->
-                    <uc:Item Title="Cole Strickland" Message="Okey, Nice work" Color="#73afff" MessageCount="2" Image="/Resources/Images/p1.jpg"/>
-                    <uc:Item Title="Reza Asadi" Message="Plz share those recap to me" Image="/Resources/Images/p2.jpg"/>
-                    <uc:Item Title="Gavin Harrison" Message="You can check it now" Image="/Resources/Images/p3.jpg"/>
-                    <uc:Item Title="Lillian Davis" Message="OMG !!!" Color="#5ac795" MessageCount="3" Image="/Resources/Images/p4.jpg"/>
-
-                    <Button Content="Show All" Style="{StaticResource showBoxButton}"/>
-
+                    <!--<TextBlock Text="Groups" Margin="25 0 0 5" Style="{StaticResource titleText}"/>-->
+                    <ItemsControl ItemsSource="{Binding ChatModels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <uc:Item Title="{Binding NickName}" 
+                                 Message="{Binding Message}" 
+                                 Color="{Binding Color}" 
+                                 TagName="{Binding TagName}" 
+                                 MessageCount="{Binding MessageCount}" 
+                                 Image="{Binding Image}"/>  
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </Grid>
         </Border>
-
-
+        
         <!--chat section-->
         <Border CornerRadius="15" Background="#ffffff" Grid.Column="2" Grid.Row="1" Margin="0 0 30 30" ClipToBounds="True">
             <Grid>
@@ -153,56 +133,32 @@
                     <TextBlock Text="Moonlab Std" FontSize="16" Margin="20 15" HorizontalAlignment="Left"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0 0 10 0" HorizontalAlignment="Right">
-
-                        <uc:UserImage Image="/Resources/Images/p10.jpg" Margin="0 0 -15 0"/>
-                        <uc:UserImage Image="/Resources/Images/p11.jpg" Margin="0 0 -15 0"/>
-                        <uc:UserImage Image="/Resources/Images/p12.jpg" />
-
-                        <TextBlock Text="and 3 others" VerticalAlignment="Center" Margin="7 0" Foreground="#8b8a8f" FontSize="11"/>
-
-                        <Button Style="{StaticResource textBoxButton}">
+                        <TextBlock Text=" " VerticalAlignment="Center" Margin="7 0" Foreground="#8b8a8f" FontSize="11"/>
+                        <Button Style="{StaticResource textBoxButton}" Command = "{Binding NothingCommand}">
                             <Icon:PackIconMaterial Kind="DotsVertical" Width="14" Height="14" Foreground="#88878e"/>
                         </Button>
                     </StackPanel>
                 </Grid>
 
                 <!--chats-->
-
                 <StackPanel Grid.Row="1" Margin="20 10 20 20">
                     <uc:Chat_Seprator Title="Yesterday"/>
-
                     <uc:UserChat Username="Maud Carson" Image="/Resources/Images/p11.jpg" />
-
                     <uc:Messagechat Color="#ff82a3" Message="Hello my friends"/>
-
                     <TextBlock Text="3:10 PM" Style="{StaticResource timeText}"/>
-
                     <uc:MyMessageChat Message="Hi Maud, Are you ok?"/>
-
                     <uc:MyMessageChat Message="Guys we have a plan to choose best way"/>
-
                     <TextBlock Text="4:15 PM" Style="{StaticResource timeTextRight}"/>
-
                     <uc:UserChat Username="Russell Greene" Image="/Resources/Images/p10.jpg" />
-
                     <uc:Messagechat Color="#c490ff" Message="Can you share your opinion?"/>
-
                     <TextBlock Text="6:39 PM" Style="{StaticResource timeText}"/>
-
                     <uc:Chat_Seprator Title="Today" Margin="0 5 0 0"/>
-
                     <uc:UserChat Username="Cole Strickland" Image="/Resources/Images/p12.jpg"/>
-
                     <uc:Messagechat Color="#68cfa3" Message="Yes Russell, just dont talk about it with others."/>
-
                     <uc:Messagechat Color="#68cfa3" Message="Our plan have a new tactics ..."/>
-
                     <TextBlock Text="3:25 PM" Style="{StaticResource timeText}"/>
-
                     <uc:MyMessageChat Message="I'm waiting for Maud for comeback to the chat"/>
-
                     <TextBlock Text="3:26 PM" Style="{StaticResource timeTextRight}"/>
-
                 </StackPanel>
 
                 <!--bottom message section-->
@@ -215,29 +171,24 @@
                     <!--message textbox-->
                     <Grid>
                         <TextBlock Margin="15 0 120 0" VerticalAlignment="Center" Foreground="#868686" Panel.ZIndex="1"
-                               IsHitTestVisible="False" Text="Type your message ..."
+                               IsHitTestVisible="False" 
                                Visibility="{Binding ElementName=txtMessage,Converter={StaticResource BoolTovis}}"/>
-
                         <TextBox x:Name="txtMessage" Style="{StaticResource messageTextbox}" 
-                             Text="{Binding SendMsg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                MaxHeight="100" Text="{Binding SendMsg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
                         <!--buttons-->
-                        <StackPanel Orientation="Horizontal" Margin="0 0 8 0" HorizontalAlignment="Right" VerticalAlignment="Center">
-
+                        <!--<StackPanel Orientation="Horizontal" Margin="0 0 8 0" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <Button Style="{StaticResource textBoxButton}" Margin="0 0 1 0">
                                 <Icon:PackIconMaterial Kind="BookmarkMultipleOutline" Width="12" Foreground="#a6a6a6"/>
                             </Button>
-
                             <Button Style="{StaticResource textBoxButton}">
                                 <Icon:PackIconMaterial Kind="Paperclip" Width="12" Foreground="#a6a6a6"/>
                             </Button>
-
                             <Button Style="{StaticResource textBoxButton}">
                                 <Icon:PackIconMaterial Kind="MicrophoneOutline" Width="12" Foreground="#a6a6a6"/>
                             </Button>
-                        </StackPanel>
+                        </StackPanel>-->
                     </Grid>
-
 
                     <!--sendbutton-->
                     <Button Grid.Column="1" Margin="5 0 0 0" Style="{StaticResource textBoxButton}"  Command="{Binding SendCommand}">
@@ -247,10 +198,7 @@
                             </Icon:PackIconMaterial.LayoutTransform>
                         </Icon:PackIconMaterial>
                     </Button>
-
-
                 </Grid>
-
             </Grid>
         </Border>
     </Grid>

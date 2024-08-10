@@ -31,4 +31,5 @@ public class MsgModel
     public string Msg { get; set; } = "";
 
     public HashSet<string> Uids { get; set; } = [];
+    List<ChatModel> ChatModelList { get; set; } = [];
 }

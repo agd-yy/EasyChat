@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EasyChat.Controls;
 using EasyChat.Models;
 using EasyChat.Service;
 using EasyChat.Utilities;
@@ -18,6 +20,7 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
+        ChatModels.Add(new ChatModel { NickName = "New Item", Message = "New Message", Color = "#ffad2c", TagName = "NI", MessageCount = 1, Image = "/Resources/Images/p1.jpg" });
         // 客户端名绑定界面
         _nickName = string.IsNullOrEmpty(loginViewModel.UserName) ? _myClient.MyClientUID : loginViewModel.UserName;
         SubscribeUid = _nickName;
@@ -50,7 +53,7 @@ public partial class MainViewModel : ObservableObject
         ReceiveMsg += needAdd;
     }
 
-
+    #region Commands
     [RelayCommand]
     private void Send()
     {
@@ -75,7 +78,6 @@ public partial class MainViewModel : ObservableObject
             MessageBox.Show(ex.Message, "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
-
 
     [RelayCommand]
     private void Subscribe()
@@ -127,7 +129,16 @@ public partial class MainViewModel : ObservableObject
         Send();
     }
 
+    [RelayCommand]
+    private void Nothing()
+    {
+        EcMsgBox.Show("这个功能还没做");
+    }
+    #endregion
+
     #region Property
+
+    public ObservableCollection<ChatModel> ChatModels { get; } = new ObservableCollection<ChatModel>();
 
     /// <summary>
     ///     发送信息
@@ -155,6 +166,11 @@ public partial class MainViewModel : ObservableObject
     ///     在线人员
     /// </summary>
     [ObservableProperty] private string _onlinePerson = string.Empty;
+
+    /// <summary>
+    ///     在线人员
+    /// </summary>
+    [ObservableProperty] private string _chat = string.Empty;
 
     #endregion
 }

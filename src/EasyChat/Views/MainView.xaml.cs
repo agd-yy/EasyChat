@@ -1,5 +1,4 @@
 ﻿using EasyChat.ViewModels;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -28,23 +27,15 @@ public partial class MainView
         {
             if (IsMaximized)
             {
-                this.WindowState = WindowState.Normal;
-                this.Width = 1250;
-                this.Height = 830;
-
+                WindowState = WindowState.Normal;
                 IsMaximized = false;
             }
             else
             {
-                this.WindowState = WindowState.Maximized;
+                WindowState = WindowState.Maximized;
                 IsMaximized = true;
             }
         }
-    }
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        Hide();
-        e.Cancel = true;
     }
 
     private void TxtMessage_KeyDown(object sender, KeyEventArgs e)
@@ -64,5 +55,27 @@ public partial class MainView
                 viewModel.EnterCommand.Execute(null);
             }
         }
+    }
+    private void Minimize(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+    private void Maximize(object sender, RoutedEventArgs e)
+    {
+        if (IsMaximized)
+        {
+            WindowState = WindowState.Normal;
+            IsMaximized = false;
+        }
+        else
+        {
+            WindowState = WindowState.Maximized;
+            IsMaximized = true;
+        }
+    }
+
+    private void OnClose(object sender, RoutedEventArgs e)
+    {
+        Hide();
     }
 }
