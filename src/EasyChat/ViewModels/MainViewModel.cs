@@ -17,18 +17,34 @@ public partial class MainViewModel : ObservableObject
     // 客户端的昵称
     private string _nickName;
 
-
     public MainViewModel()
     {
-        ChatModels.Add(new ChatModel { NickName = "New Item", Message = "New Message", Color = "#ffad2c", TagName = "NI", MessageCount = 1, Image = "/Resources/Images/p1.jpg" });
         // 客户端名绑定界面
         _nickName = string.IsNullOrEmpty(loginViewModel.UserName) ? _myClient.MyClientUID : loginViewModel.UserName;
+        ChatModels.Add(new ChatModel {Uid = _myClient.MyClientUID, NickName = _nickName, 
+            Message = "", TagName = "NI", MessageCount = 0, Image = "/Resources/Images/p1.jpg" });
         SubscribeUid = _nickName;
         //启动客户端
         _myClient.StartClient(loginViewModel.IpAddr);
 
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
+
+        ChatMessages = new ObservableCollection<ChatMessage>
+        {
+            new ChatMessage { SeparatorTitle = "Yesterday" },
+            new ChatMessage { NickName = "Name1", Image = "/Resources/Images/p11.jpg" },
+            new ChatMessage { Message = "Hello my friends", Time = "3:10 PM", Color = "#ff82a3" },
+            new ChatMessage { Message = "Hi Maud, Are you ok?", Time = "4:15 PM", IsMyMessage = true },
+            new ChatMessage { Message = "Guys we have a plan to choose best way", Time = "4:15 PM", IsMyMessage = true },
+            new ChatMessage { SeparatorTitle = "Today" },
+            new ChatMessage { NickName = "Name2", Image = "/Resources/Images/p10.jpg" },
+            new ChatMessage { Message = "Can you share your opinion?", Time = "6:39 PM", Color = "#c490ff" },
+            new ChatMessage { NickName = "Name3", Image = "/Resources/Images/p12.jpg" },
+            new ChatMessage { Message = "Yes Russell, just dont talk about it with others.", Time = "3:25 PM", Color = "#68cfa3" },
+            new ChatMessage { Message = "Our plan have a new tactics ...", Time = "3:25 PM", Color = "#68cfa3" },
+            new ChatMessage { Message = "I'm waiting for Maud for comeback to the chat", Time = "3:26 PM", IsMyMessage = true }
+        };
     }
 
     /// <summary>
@@ -139,6 +155,9 @@ public partial class MainViewModel : ObservableObject
     #region Property
 
     public ObservableCollection<ChatModel> ChatModels { get; } = new ObservableCollection<ChatModel>();
+
+
+    public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new ObservableCollection<ChatMessage>();
 
     /// <summary>
     ///     发送信息

@@ -4,6 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:vm="clr-namespace:EasyChat.ViewModels"
+                 xmlns:m="clr-namespace:EasyChat.Models"
                  xmlns:view="clr-namespace:EasyChat.Views"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:Icon ="http://metro.mahapps.com/winfx/xaml/iconpacks"
@@ -16,22 +17,22 @@
     </Window.DataContext>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolTovis"/>
+        <m:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <m:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="55"/>
-            <ColumnDefinition Width="350"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="70*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid>
-            <view:TrayView Grid.Row="0" />
-        </Grid>
+        <view:TrayView Grid.Row="0" />
+        
         <!--background-->
         <Border CornerRadius="0 20 20 0" Background="#f8f7fc" Grid.Column="1" Grid.ColumnSpan="2" Margin="-25 0 0 0" Grid.RowSpan="2" MouseDown="Border_MouseDown" MouseLeftButtonDown="Boreder_MouseLeftButtonDown"/>
 
@@ -119,9 +120,9 @@
         <Border CornerRadius="15" Background="#ffffff" Grid.Column="2" Grid.Row="1" Margin="0 0 30 30" ClipToBounds="True">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="6*"/>
+                    <RowDefinition Height="74*"/>
+                    <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
 
                 <!--Top chat menubar-->
@@ -140,27 +141,29 @@
                     </StackPanel>
                 </Grid>
 
-                <!--chats-->
-                <StackPanel Grid.Row="1" Margin="20 10 20 20">
-                    <uc:Chat_Seprator Title="Yesterday"/>
-                    <uc:UserChat Username="Maud Carson" Image="/Resources/Images/p11.jpg" />
-                    <uc:Messagechat Color="#ff82a3" Message="Hello my friends"/>
-                    <TextBlock Text="3:10 PM" Style="{StaticResource timeText}"/>
-                    <uc:MyMessageChat Message="Hi Maud, Are you ok?"/>
-                    <uc:MyMessageChat Message="Guys we have a plan to choose best way"/>
-                    <TextBlock Text="4:15 PM" Style="{StaticResource timeTextRight}"/>
-                    <uc:UserChat Username="Russell Greene" Image="/Resources/Images/p10.jpg" />
-                    <uc:Messagechat Color="#c490ff" Message="Can you share your opinion?"/>
-                    <TextBlock Text="6:39 PM" Style="{StaticResource timeText}"/>
-                    <uc:Chat_Seprator Title="Today" Margin="0 5 0 0"/>
-                    <uc:UserChat Username="Cole Strickland" Image="/Resources/Images/p12.jpg"/>
-                    <uc:Messagechat Color="#68cfa3" Message="Yes Russell, just dont talk about it with others."/>
-                    <uc:Messagechat Color="#68cfa3" Message="Our plan have a new tactics ..."/>
-                    <TextBlock Text="3:25 PM" Style="{StaticResource timeText}"/>
-                    <uc:MyMessageChat Message="I'm waiting for Maud for comeback to the chat"/>
-                    <TextBlock Text="3:26 PM" Style="{StaticResource timeTextRight}"/>
-                </StackPanel>
-
+                <Grid Grid.Row="1" Margin="10 0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding ChatMessages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <!-- Chat Separator -->
+                                        <uc:Chat_Seprator Title="{Binding SeparatorTitle}" Visibility="{Binding SeparatorTitle, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        <!-- User Chat -->
+                                        <uc:UserChat Username="{Binding Username}" Image="{Binding Image}" Visibility="{Binding NickName, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        <!-- Message Chat -->
+                                        <uc:Messagechat Color="{Binding Color}" Message="{Binding Message}" Visibility="{Binding Message, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        <!-- Message Time -->
+                                        <TextBlock Text="{Binding Time}" Style="{StaticResource timeText}" Visibility="{Binding Time, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        <!-- My Message Chat -->
+                                        <uc:MyMessageChat Message="{Binding Message}" Visibility="{Binding IsMyMessage, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                
                 <!--bottom message section-->
                 <Grid Grid.Row="2" Margin="10 0">
                     <Grid.ColumnDefinitions>
