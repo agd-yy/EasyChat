@@ -13,7 +13,7 @@ public class MsgModel
     /// <summary>
     ///     头像
     /// </summary>
-    public string AvatarIcon { get; set; } = "";
+    public string Img { get; set; } = "";
 
     /// <summary>
     ///     昵称
@@ -30,6 +30,8 @@ public class MsgModel
     /// </summary>
     public string Msg { get; set; } = "";
 
-    public HashSet<string> Uids { get; set; } = [];
-    List<ChatModel> ChatModelList { get; set; } = [];
+    /// <summary>
+    /// 所有在线用户
+    /// </summary>
+    public List<ChatModel> ChatModels { get; set; } = [];
 }

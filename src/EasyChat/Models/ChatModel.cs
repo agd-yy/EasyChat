@@ -4,6 +4,7 @@ namespace EasyChat.Models
 {
     public class ChatModel : ObservableObject
     {
+        // 昵称
         private string _nickName = "";
         public string NickName
         {

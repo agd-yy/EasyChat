@@ -12,7 +12,8 @@ public class MqttService
     private static readonly MqttService mqttService = new();
     private static IMqttServer? server;
     // 记录当前在线客户端
-    private static HashSet<string> onlineClientUids = [];
+    //private static HashSet<string> onlineClientUids = [];
+    private static List<ChatModel> onlineClientUids = [];
 
     private MqttService()
     {
@@ -124,7 +125,7 @@ public class MqttService
         {
             var msg = EncryptUtilities.Encrypt(new MsgModel()
             {
-                Uids = onlineClientUids,
+                ChatModels = onlineClientUids,
                 SendTime = DateTime.Now
             }.Serialize());
             ServierPublish(MqttContent.ONLINE, msg);
@@ -138,10 +139,10 @@ public class MqttService
     /// <param name="args"></param>
     private static void ClientConnected(MqttServerClientConnectedEventArgs args)
     {
-        onlineClientUids.Add(args.ClientId);
+        onlineClientUids.Add(new ChatModel() { Uid = args.ClientId });
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            Uids = onlineClientUids,
+            ChatModels = onlineClientUids,
             SendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);
@@ -153,10 +154,10 @@ public class MqttService
     /// <param name="args"></param>
     private static void ClientDisConnected(MqttServerClientDisconnectedEventArgs args)
     {
-        onlineClientUids.Remove(args.ClientId);
+        onlineClientUids.Where(o => o.Uid != args.ClientId);
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            Uids = onlineClientUids,
+            ChatModels = onlineClientUids,
             SendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);

@@ -100,7 +100,7 @@
                 <!--group items-->
                 <StackPanel Margin="30 0 15 0">
                     <!--<TextBlock Text="Groups" Margin="25 0 0 5" Style="{StaticResource titleText}"/>-->
-                    <ItemsControl ItemsSource="{Binding ChatModels}">
+                    <ItemsControl ItemsSource="{Binding ChatUsers}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <uc:Item Title="{Binding NickName}" 
@@ -150,7 +150,7 @@
                                         <!-- Chat Separator -->
                                         <uc:Chat_Seprator Title="{Binding SeparatorTitle}" Visibility="{Binding SeparatorTitle, Converter={StaticResource NullToVisibilityConverter}}" />
                                         <!-- User Chat -->
-                                        <uc:UserChat Username="{Binding Username}" Image="{Binding Image}" Visibility="{Binding NickName, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        <uc:UserChat Username="{Binding NickName}" Image="{Binding Image}" Visibility="{Binding NickName, Converter={StaticResource NullToVisibilityConverter}}"/>
                                         <!-- Message Chat -->
                                         <uc:Messagechat Color="{Binding Color}" Message="{Binding Message}" Visibility="{Binding Message, Converter={StaticResource NullToVisibilityConverter}}"/>
                                         <!-- Message Time -->
