@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="EasyChat.Views.SubControls.UserListUc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:EasyChat.ViewModels.SubVms"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:UserListVm}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <ListBox Name="UserListBox" ItemsSource="{Binding Users}">
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding SelectedCommand}"
+                                       CommandParameter="{Binding ElementName=UserListBox, Path=SelectedItem}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Border Name="UserBorder"
+                        Background="{Binding Color}"
+                        Height="40">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding NickName}"
+                                   VerticalAlignment="Center"
+                                   Margin="20 0"/>
+                        <TextBlock Visibility="{Binding MessageCount, Converter={StaticResource UIntToVisibilityConverter}}">
+                            <Run Text="["/>
+                            <Run Text="{Binding MessageCount}"/>
+                            <Run Text="]"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="UserBorder" Property="Background" Value="#cfcfcf" />
+                    </Trigger>
+                    <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" Value="True">
+                        <Setter TargetName="UserBorder" Property="Background" Value="#c4c4c5" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>
