@@ -14,7 +14,8 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private readonly LoginViewModel _loginViewModel = Singleton<LoginViewModel>.Instance;
-    private readonly ChatModel _myChatModel;
+    private readonly ChatModel _myChatModel = new ChatModel();
+    private readonly Dictionary<string, ChatModel> _chatModelDic = new Dictionary<string, ChatModel>();
 
     public MainViewModel()
     {
@@ -22,17 +23,20 @@ public partial class MainViewModel : ObservableObject
         var nickName = string.IsNullOrEmpty(_loginViewModel.UserName) ? _myClient.MyClientUid : _loginViewModel.UserName;
         _myChatModel = new ChatModel
         {
-            Uid = _myClient.MyClientUid,
-            NickName = nickName,
+            UserModel = new UserModel() {
+                uid = _myClient.MyClientUid,
+                nickName = nickName,
+                image = MqttContent.GetRandomImg()
+            },
             Message = "",
             TagName = "",
-            MessageCount = 0,
-            Image = MqttContent.GetRandomImg()
+            MessageCount = 0
         };
         UserListVm.Users.Add(_myChatModel);
+        UserOrGroupCombine();
         SubscribeUid = nickName;
         //启动客户端
-        _myClient.StartClient(_loginViewModel.IpAddr);
+        _myClient.StartClient(_loginViewModel.IpAddr, _myChatModel.UserModel);
 
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
@@ -40,21 +44,6 @@ public partial class MainViewModel : ObservableObject
         //TODO:添加用户选择回调
         //UserListVm.OnSelected += 
 
-        //ChatMessages.Add(new ChatMessage { Message = "Guys we have a plan to choose best way", Time = "4:15 PM", IsMyMessage = true });
-        //{
-        //    //new ChatMessage { SeparatorTitle = "Yesterday" },
-        //    //new ChatMessage { NickName = "Name1", Image = "/Resources/Images/p11.jpg" },
-        //    //new ChatMessage { Message = "Hello my friends", Time = "3:10 PM", Color = "#ff82a3" },
-        //    //new ChatMessage { Message = "Hi Maud, Are you ok?", Time = "4:15 PM", IsMyMessage = true },
-        //    new ChatMessage { Message = "Guys we have a plan to choose best way", Time = "4:15 PM", IsMyMessage = true },
-        //    new ChatMessage { SeparatorTitle = "Today" },
-        //    new ChatMessage { NickName = "Name2", Image = "/Resources/Images/p10.jpg" },
-        //    new ChatMessage { Message = "Can you share your opinion?", Time = "6:39 PM", Color = "#c490ff" },
-        //    new ChatMessage { NickName = "Name3", Image = "/Resources/Images/p12.jpg" },
-        //    new ChatMessage { Message = "Yes Russell, just dont talk about it with others.", Time = "3:25 PM", Color = "#68cfa3" },
-        //    new ChatMessage { Message = "Our plan have a new tactics ...", Time = "3:25 PM", Color = "#68cfa3" },
-        //    new ChatMessage { Message = "I'm waiting for Maud for comeback to the chat", Time = "3:26 PM", IsMyMessage = true }
-        //};
     }
 
     /// <summary>
@@ -67,28 +56,60 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-        UserListVm.Users.Clear();
-        foreach (var chatModel in msgModel.ChatModels)
-        {
-            UserListVm.Users.Add(chatModel);
-        }
-    }
-
-    /// <summary>
-    ///     客户端修改页面信息
-    /// </summary>
-    /// <param name="needAdd"></param>
-    private void ClientChangeReceiveMsg(List<ChatMessage> needAdd)
-    {
         Application.Current.Dispatcher.Invoke(() =>
         {
-            foreach (ChatMessage msg in needAdd)
+            UserListVm.Users.Clear();
+            foreach (var userModel in msgModel.userModels)
             {
-                ChatMessages.Add(msg);
+                UserListVm.Users.Add(new ChatModel()
+                {
+                    GroupName = userModel.nickName,
+                    UserModel = userModel
+                });
             }
+            UserOrGroupCombine();
         });
     }
 
+    /// <summary>
+    ///  客户端接受消息
+    /// </summary>
+    /// <param name="newMsg"></param>
+    private void ClientChangeReceiveMsg(MsgModel newMsg)
+    {
+        // 先取这个消息是谁的，加到对应的消息里，
+        // 更新最新一条消息，如果当前选中的对话框不是这个用户，则未读消息++
+        if(newMsg.isGroupMsg)
+        {
+            //List<ChatMessage> list = new List<ChatMessage>();
+            //list.Add(new ChatMessage { nickName = msgModel.userModel.nickName, image = msgModel.userModel.image });
+            //list.Add(new ChatMessage { message = msgModel.msg, time = msgModel.sendTime.ToString(),
+            //isMyMessage = msgModel.userModel.uid == MyClientUid});
+        }
+        else
+        {
+            //List<ChatMessage> list = new List<ChatMessage>();
+            //list.Add(new ChatMessage { nickName = msgModel.userModel.nickName, image = msgModel.userModel.image });
+            //list.Add(new ChatMessage { message = msgModel.msg, time = msgModel.sendTime.ToString() });
+        }
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            //foreach (ChatMessage msg in needAdd)
+            //{
+            //    ChatMessages.Add(msg);
+            //}
+        });
+    }
+
+    /// <summary>
+    /// 将UserListVm.Users 和内存的消息合并
+    /// 如果_chatModelDic=存在UserListVm.Users没有的用户，那么就是用户下线
+    /// </summary>
+    private void UserOrGroupCombine()
+    {
+        
+
+    }
     #region Commands
     [RelayCommand]
     private void Send()
@@ -101,11 +122,10 @@ public partial class MainViewModel : ObservableObject
                     _myClient.SendMsg(MqttContent.MESSAGE + SendTopic,
                         new MsgModel
                         {
-                            Uid = _myChatModel.Uid,
-                            SendTime = DateTime.Now,
-                            Msg = SendMsg,
-                            NickName = _myChatModel.NickName,
-                            Img = _myChatModel.Image
+                            userModel = _myChatModel.UserModel,
+                            sendTime = DateTime.Now,
+                            message = SendMsg
+                            // 这里确认是组消息还是私消息 TODO
                         });
                     SendMsg = "";
                 });
@@ -126,17 +146,17 @@ public partial class MainViewModel : ObservableObject
                 // 重命名自己 --注意规避特殊字符
                 if (string.IsNullOrEmpty(SubscribeUid) || SubscribeUid.Contains(MqttContent.SUB_STRING))
                 {
-                    MessageBox.Show("昵称不合规", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    EcMsgBox.Show("昵称不合规");
                     return;
                 }
 
-                _myChatModel.NickName = SubscribeUid;
-                MessageBox.Show("昵称修改成功");
+                _myChatModel.UserModel.nickName = SubscribeUid;
+                EcMsgBox.Show("昵称修改成功");
             });
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            EcMsgBox.Show(ex.Message);
         }
     }
 
@@ -148,10 +168,12 @@ public partial class MainViewModel : ObservableObject
         // 询问在线的机子
         _myClient.SendMsg(MqttContent.WHO_ONLINE, new MsgModel
         {
-            Uid = _myClient.MyClientUid,
-            SendTime = DateTime.Now,
-            NickName = _myChatModel.NickName,
-            Img = _myChatModel.Image
+            userModel = new UserModel() {
+                uid = _myClient.MyClientUid,
+                nickName = _myChatModel.UserModel.nickName,
+                image = _myChatModel.UserModel.image
+            },
+            sendTime = DateTime.Now
         });
     }
 

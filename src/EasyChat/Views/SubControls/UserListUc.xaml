@@ -32,7 +32,7 @@
                         Background="{Binding Color}"
                         Height="40">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding NickName}"
+                        <TextBlock Text="{Binding UserModel.nickName}"
                                    VerticalAlignment="Center"
                                    Margin="20 0"/>
                         <TextBlock Visibility="{Binding MessageCount, Converter={StaticResource UIntToVisibilityConverter}}">
