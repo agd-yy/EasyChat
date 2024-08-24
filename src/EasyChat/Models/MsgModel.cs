@@ -1,37 +1,37 @@
 namespace EasyChat.Models;
 
 /// <summary>
-///     消息封装体对象
+/// 消息封装体对象
 /// </summary>
 public class MsgModel
 {
     /// <summary>
-    ///     UID
+    /// userModel
     /// </summary>
-    public string Uid { get; set; } = "";
+    public UserModel userModel { get; set; } = new UserModel();
 
     /// <summary>
-    ///     头像
+    /// 发消息的时间
     /// </summary>
-    public string Img { get; set; } = "";
+    public DateTime sendTime { get; set; }
 
     /// <summary>
-    ///     昵称
+    /// 消息体
     /// </summary>
-    public string NickName { get; set; } = "";
+    public string message { get; set; } = "";
 
     /// <summary>
-    ///     发消息的时间
+    /// 是否是群消息
     /// </summary>
-    public DateTime SendTime { get; set; }
+    public bool isGroupMsg { get; set; }
 
     /// <summary>
-    ///     消息体
+    /// 群名称
     /// </summary>
-    public string Msg { get; set; } = "";
+    public string groupName { get; set; } = "";
 
     /// <summary>
-    /// 所有在线用户
+    /// 所有在线用户，仅服务端需要
     /// </summary>
-    public List<ChatModel> ChatModels { get; set; } = [];
+    public List<UserModel> userModels { get; set; } = [];
 }

@@ -1,13 +1,15 @@
 ﻿namespace EasyChat.Models;
 
+/// <summary>
+/// 聊天内容对象
+/// </summary>
 public class ChatMessage
 {
-    public ChatModel ChatModel { get; set; } = new();
-    public string? NickName { get; set; }
-    public string? Image { get; set; }
-    public string? Message { get; set; }
-    public string? Time { get; set; }
-    public bool IsMyMessage { get; set; }
-    public string? SeparatorTitle { get; set; }
-    public string Color { get; set; } = "#ff82a3";
+    public string? nickName { get; set; }
+    public string? image { get; set; }
+    public string? message { get; set; }
+    public string? time { get; set; }
+    public bool isMyMessage { get; set; }
+    public string? separatorTitle { get; set; }
+    public string color { get; set; } = "#ff82a3";
 }

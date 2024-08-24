@@ -49,8 +49,7 @@
             <!--#endregion-->
 
             <!--#region// 聊天列表 //-->
-            <subView:UserListUc Grid.Column="1"
-                                DataContext="{Binding UserListVm}" />
+            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" />
             <!--#endregion-->
 
             <!--#region// 分割线 //-->

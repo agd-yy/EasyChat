@@ -13,14 +13,12 @@ namespace EasyChat.Service;
 public class MyMqttClient : SingletonBase<MyMqttClient>
 {
     public string MyClientUid { get; private set; } = Guid.NewGuid().ToString();
-    public List<string> SubTopics = [];
     private readonly HashSet<string> _topicSet = [];
     public IMqttClient? MqttClient { get; private set; }
 
     // 页面事件
-    public event Action<List<ChatMessage>>? ReceiveMsgEvent;
+    public event Action<MsgModel>? ReceiveMsgEvent;
     public event Action<MsgModel>? OnlinePersonEvent;
-
 
     private MyMqttClient()
     {
@@ -35,7 +33,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     /// </summary>
     /// <param name="ip"></param>
     /// <returns></returns>
-    public async void StartClient(string ip)
+    public async void StartClient(string ip, UserModel user)
     {
         // 创建Mqtt客户端工厂
         var factory = new MqttFactory();
@@ -44,7 +42,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         // 配置Mqtt客户端选项
         var options = new MqttClientOptionsBuilder()
             .WithTcpServer(ip, MqttContent.SERVER_PORT) // 设置MQTT服务器地址和端口
-            .WithClientId(MyClientUid)
+            .WithClientId(JsonExtension.Serialize(user))
             .WithCredentials(MqttContent.SERVER_USER, MqttContent.SERVER_PW) // 设置用户名密码
             .Build();
 
@@ -54,12 +52,12 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             await MqttClient.ConnectAsync(options);
             if (MqttClient.IsConnected)
             {
-                ReceiveMsgEvent?.Invoke([new ChatMessage { Message = "连接服务器成功", Time = DateTime.Now.ToString()}]);
+                ReceiveMsgEvent?.Invoke(new MsgModel { message = "连接服务器成功", sendTime = DateTime.Now});
             }
         }
         catch
         {
-            ReceiveMsgEvent?.Invoke([new ChatMessage { Message = "连接服务器失败", Time = DateTime.Now.ToString()}]);
+            ReceiveMsgEvent?.Invoke(new MsgModel { message = "连接服务器失败", sendTime = DateTime.Now});
         }
 
         // 订阅主题
@@ -73,13 +71,13 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             {
                 // 重新连接
                 await MqttClient.ConnectAsync(options);
-                if (MqttClient.IsConnected) ReceiveMsgEvent?.Invoke([new ChatMessage { Message = "重新连接服务器成功", Time = DateTime.Now.ToString()}]);
+                if (MqttClient.IsConnected) ReceiveMsgEvent?.Invoke(new MsgModel { message = "重新连接服务器成功", sendTime = DateTime.Now});
                 // 重新订阅
                 InitSubTopic();
             }
             catch
             {
-                ReceiveMsgEvent?.Invoke([new ChatMessage { Message = "重连服务器失败", Time = DateTime.Now.ToString()}]);
+                ReceiveMsgEvent?.Invoke(new MsgModel { message = "重连服务器失败", sendTime = DateTime.Now});
             }
         });
     }
@@ -134,7 +132,6 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             // 订阅消息
             await MqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic)
                 .WithQualityOfServiceLevel((MqttQualityOfServiceLevel)qosLevel).Build());
-            SubTopics.Add(topic);
         }
         catch
         {
@@ -172,29 +169,21 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             {
                 return;
             }
-            // 全局消息
+            // 全局消息 or 群消息
             if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
             {
-                List<ChatMessage> list = new List<ChatMessage>();
-                list.Add(new ChatMessage { NickName = msgModel.NickName, Image = msgModel.Img });
-                list.Add(new ChatMessage { Message = msgModel.Msg, Time = msgModel.SendTime.ToString(),
-                IsMyMessage = msgModel.Uid == MyClientUid});
-                ReceiveMsgEvent?.Invoke(list);
+                msgModel.isGroupMsg = true;
+                ReceiveMsgEvent?.Invoke(msgModel);
             }
             // 收到其他客户端在线消息
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
             {
-                msgModel.ChatModels.Where(o => o.Uid != MyClientUid);
                 OnlinePersonEvent?.Invoke(msgModel);
             }
-            //其他客户端指定消息
+            // 私发消息
             else if (args.ApplicationMessage.Topic.Contains(MyClientUid))
             {
-                List<ChatMessage> list = new List<ChatMessage>();
-                list.Add(new ChatMessage { NickName = msgModel.NickName, Image = msgModel.Img });
-                list.Add(new ChatMessage { Message = msgModel.Msg, Time = msgModel.SendTime.ToString() });
-                ReceiveMsgEvent?.Invoke(list);
-                //MessageBox.Show("有您的指名消息❤~");
+                ReceiveMsgEvent?.Invoke(msgModel);
             }
         }
         catch
