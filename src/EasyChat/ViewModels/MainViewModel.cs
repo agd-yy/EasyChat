@@ -40,9 +40,8 @@ public partial class MainViewModel : ObservableObject
 
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
-
-        //TODO:添加用户选择回调
-        //UserListVm.OnSelected += 
+        // 用户选择回调
+        UserListVm.OnSelected += UserSelect;
 
     }
 
@@ -108,6 +107,11 @@ public partial class MainViewModel : ObservableObject
     private void UserOrGroupCombine()
     {
         
+
+    }
+
+    private void UserSelect(ChatModel chatModel)
+    {
 
     }
     #region Commands
