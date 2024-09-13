@@ -23,18 +23,16 @@ public partial class MainViewModel : ObservableObject
         var nickName = string.IsNullOrEmpty(_loginViewModel.UserName) ? _myClient.MyClientUid : _loginViewModel.UserName;
         MyChatModel = new ChatModel
         {
-            UserModel = new UserModel() {
-                uid = _myClient.MyClientUid,
-                nickName = nickName,
-                image = MqttContent.GetRandomImg()
-            },
+            Uid = _myClient.MyClientUid,
+            NickName = nickName,
+            Image = MqttContent.GetRandomImg(),
             Message = "",
             TagName = "",
             MessageCount = 0
         };
         UserListVm.Users.Add(MyChatModel);
         //启动客户端
-        _myClient.StartClient(_loginViewModel.IpAddr, MyChatModel.UserModel);
+        _myClient.StartClient(_loginViewModel.IpAddr, MyChatModel);
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
         // 用户选择回调
@@ -60,7 +58,11 @@ public partial class MainViewModel : ObservableObject
                 UserListVm.Users.Add(new ChatModel()
                 {
                     GroupName = userModel.nickName,
-                    UserModel = userModel
+                    Uid = userModel.uid,
+                    Image = userModel.image,
+                    NickName = userModel.nickName,
+                    IsOnline = userModel.isOnline,
+                    IsGroup = userModel.isGroup
                 });
             }
             UserOrGroupCombine();
@@ -81,7 +83,7 @@ public partial class MainViewModel : ObservableObject
             Image = newMsg.userModel.image,
             Message = newMsg.message,
             Time = newMsg.sendTime.ToString(),
-            IsMyMessage = newMsg.userModel.uid == MyChatModel.UserModel.uid
+            IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid
         };
         Application.Current.Dispatcher.Invoke(() =>
         {
@@ -91,20 +93,18 @@ public partial class MainViewModel : ObservableObject
                 if (_chatMessageDic.ContainsKey(newMsg.groupName))
                 {
                     _chatMessageDic[newMsg.groupName].Add(chats);
-                    UserListVm.Users.Where(x => x.UserModel.uid == newMsg.groupName).First().MessageCount++;
+                    UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
                 }
                 else
                 {
                     _chatMessageDic.Add(newMsg.groupName, new List<ChatMessage> { chats});
                     var chatmodel = new ChatModel
                     {
-                        UserModel = new UserModel()
-                        {
-                            uid = newMsg.groupName,
-                            nickName = newMsg.groupName,
-                            image = MqttContent.GetRandomImg(),
-                            isGroup = true
-                        },
+                        
+                        Uid = newMsg.groupName,
+                        NickName = newMsg.groupName,
+                        Image = MqttContent.GetRandomImg(),
+                        IsGroup = true,
                         Message = newMsg.message,
                         TagName = "",
                         MessageCount = 1
@@ -117,16 +117,16 @@ public partial class MainViewModel : ObservableObject
                 if (_chatMessageDic.ContainsKey(newMsg.userModel.uid))
                 {
                     _chatMessageDic[newMsg.userModel.uid].Add(chats);
-                    UserListVm.Users.Where(x => x.UserModel.uid == newMsg.userModel.uid).First().MessageCount++;
+                    UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
                 }
                 else
                 {
                     _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
                 }
             }
-            if (!string.IsNullOrEmpty(ChatObj.UserModel.nickName))
+            if (!string.IsNullOrEmpty(ChatObj.NickName))
             {       
-                ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[ChatObj.UserModel.nickName]);
+                ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[ChatObj.NickName]);
             }
         });
     }
@@ -143,8 +143,8 @@ public partial class MainViewModel : ObservableObject
 
     private void UserSelect(ChatModel chatModel)
     {
-        ChatObj.UserModel.nickName = chatModel.UserModel.nickName;
-        ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.UserModel.uid]);
+        ChatObj.NickName = chatModel.NickName;
+        ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
     }
     #region Commands
     [RelayCommand]
@@ -158,10 +158,15 @@ public partial class MainViewModel : ObservableObject
                     _myClient.SendMsg(MqttContent.MESSAGE + SendTopic,
                         new MsgModel
                         {
-                            userModel = MyChatModel.UserModel,
+                            userModel = new UserModel()
+                            {
+                                uid = MyChatModel.Uid,
+                                nickName = MyChatModel.NickName,
+                                image = MyChatModel.Image
+                            },
                             sendTime = DateTime.Now,
                             message = SendMsg,
-                            isGroupMsg = string.IsNullOrEmpty(ChatObj.UserModel.nickName) || ChatObj.UserModel.isGroup
+                            isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup
                         });
                     SendMsg = "";
                 });

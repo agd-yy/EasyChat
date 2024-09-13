@@ -39,10 +39,10 @@
             <StackPanel Background="#2e2e2e" >
                 <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 2" 
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.UserModel.nickName}" >
+                        VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.NickName}" >
                     <Ellipse Width="50" Height="50">
                         <Ellipse.Fill>
-                            <ImageBrush ImageSource="{Binding MyChatModel.UserModel.image}" />
+                            <ImageBrush ImageSource="{Binding MyChatModel.Image}" />
                         </Ellipse.Fill>
                     </Ellipse>
                 </Border>
@@ -51,7 +51,7 @@
             <!--#endregion-->
 
             <!--#region// 聊天列表 //-->
-            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" />
+            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" Grid.ColumnSpan="3" Margin="5,6,489,-6" />
             <!--#endregion-->
 
             <!--#region// 分割线 //-->
@@ -68,60 +68,13 @@
                 </Grid.RowDefinitions>
 
                 <ui:Card>
-                    <TextBlock Text="{Binding ChatObj.UserModel.nickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <TextBlock Text="{Binding ChatObj.NickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </ui:Card>
 
-                <TextBlock Grid.Row="1">
-                    <!-- Chat messages list -->
-        <ListBox ItemsSource="{Binding ChatMessages.Messages}" 
-                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10">
-                            <StackPanel>
-                                <!-- Display nickName if not empty -->
-                                <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Blue" Margin="0,0,0,5">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding NickName}" Value="">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <!-- Display message -->
-                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Message}" Value="">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-
-                            <!-- Display time if not empty -->
-                            <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Time}" Value="">
-                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-                </TextBlock>
+                <!-- Chat messages list -->
+                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" Grid.ColumnSpan="3"  />
+        
+                <!--</TextBlock>-->
                 <GridSplitter Grid.Row="2"
                               Height="1"
                               HorizontalAlignment="Stretch" />
@@ -143,8 +96,6 @@
                            Command="{Binding SendCommand}"
                            Content="发送" />
             </Grid>
-
         </Grid>
-
     </Grid>
 </ui:FluentWindow>

@@ -116,13 +116,13 @@ public class MqttService
     /// <param name="args"></param>
     private static void MessageReceived(MqttApplicationMessageReceivedEventArgs args)
     {
-        var userModel = JsonExtension.Deserialize<UserModel>(args.ClientId);
+        var userModel = JsonExtension.Deserialize<ChatModel>(args.ClientId);
         if (userModel == null)
         {
             return;
         }
         // 获取消息的客户端识别码
-        var clientId = userModel.uid;
+        var clientId = userModel.Uid;
         // 获取消息的主题
         var topic = args.ApplicationMessage.Topic;
         // 获取发送的消息内容
