@@ -3,4 +3,7 @@
                     xmlns:converter="clr-namespace:EasyChat.Converters">
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converter:BooleanToVisibilityReverseConverter x:Key="BooleanToVisibilityReverseConverter"/>
+    <converter:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    <converter:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
+    <converter:UIntToVisibilityConverter x:Key="UIntToVisibilityConverter"/>
 </ResourceDictionary>

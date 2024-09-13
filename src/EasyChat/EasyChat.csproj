@@ -8,11 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Controls\MenuButton.xaml.cs" />
+      <Compile Remove="Controls\AccountMenuButton.xaml.cs" />
+      <Compile Remove="Controls\Chat_Seprator.xaml.cs" />
+      <Compile Remove="Controls\Item.xaml.cs" />
+      <Compile Remove="Controls\Messagechat.xaml.cs" />
+      <Compile Remove="Controls\MyMessageChat.xaml.cs" />
+      <Compile Remove="Controls\UserChat.xaml.cs" />
+      <Compile Remove="Controls\UserImage.xaml.cs" />
       <Compile Remove="Views\ChatView.xaml.cs" />
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Images\p1.ico" />
       <None Remove="Resources\Images\p1.jpg" />
       <None Remove="Resources\Images\p10.jpg" />
       <None Remove="Resources\Images\p11.jpg" />
@@ -28,7 +35,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Remove="Controls\MenuButton.xaml" />
+      <Page Remove="Controls\AccountMenuButton.xaml" />
+      <Page Remove="Controls\Chat_Seprator.xaml" />
+      <Page Remove="Controls\Item.xaml" />
+      <Page Remove="Controls\Messagechat.xaml" />
+      <Page Remove="Controls\MyMessageChat.xaml" />
+      <Page Remove="Controls\UserChat.xaml" />
+      <Page Remove="Controls\UserImage.xaml" />
       <Page Remove="Views\ChatView.xaml" />
     </ItemGroup>
 
@@ -70,11 +83,6 @@
             <SubType>Designer</SubType>
         </Page>
         <Page Update="Views\Controls\UcUserInfo.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Controls\EcMsgBox.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

@@ -13,7 +13,7 @@ public class MqttService
     private static IMqttServer? server;
     // 记录当前在线客户端
     //private static HashSet<string> onlineClientUids = [];
-    private static List<ChatModel> onlineClientUids = [];
+    private static List<UserModel> onlineClientUids = [];
 
     private MqttService()
     {
@@ -78,20 +78,26 @@ public class MqttService
 
     /// <summary>
     /// 客户端发起订阅主题通知
+    /// 以后用来加群
     /// </summary>
     /// <param name="args"></param>
     private static void SubScribedTopic(MqttServerClientSubscribedTopicEventArgs args)
     {
-        // 获取客户端识别码
-        var clientId = args.ClientId;
-        // 获取客户端发起的订阅主题
-        var topic = args.TopicFilter.Topic;
+        var userModel = JsonExtension.Deserialize<UserModel>(args.ClientId);
+        if (userModel != null)
+        {
+            // 获取客户端识别码
+            var clientId = userModel.uid;
+            // 获取客户端发起的订阅主题
+            var topic = args.TopicFilter.Topic;
+            Console.WriteLine($"客户端[{clientId}]已订阅主题:{topic}");
+        }
 
-        Console.WriteLine($"客户端[{clientId}]已订阅主题:{topic}");
     }
 
     /// <summary>
     /// 客户端取消主题订阅通知
+    /// 以后用来退群
     /// </summary>
     /// <param name="args"></param>
     private static void UnScribedTopic(MqttServerClientUnsubscribedTopicEventArgs args)
@@ -110,8 +116,13 @@ public class MqttService
     /// <param name="args"></param>
     private static void MessageReceived(MqttApplicationMessageReceivedEventArgs args)
     {
+        var userModel = JsonExtension.Deserialize<ChatModel>(args.ClientId);
+        if (userModel == null)
+        {
+            return;
+        }
         // 获取消息的客户端识别码
-        var clientId = args.ClientId;
+        var clientId = userModel.Uid;
         // 获取消息的主题
         var topic = args.ApplicationMessage.Topic;
         // 获取发送的消息内容
@@ -125,8 +136,8 @@ public class MqttService
         {
             var msg = EncryptUtilities.Encrypt(new MsgModel()
             {
-                ChatModels = onlineClientUids,
-                SendTime = DateTime.Now
+                userModels = onlineClientUids,
+                sendTime = DateTime.Now
             }.Serialize());
             ServierPublish(MqttContent.ONLINE, msg);
         }
@@ -139,11 +150,16 @@ public class MqttService
     /// <param name="args"></param>
     private static void ClientConnected(MqttServerClientConnectedEventArgs args)
     {
-        onlineClientUids.Add(new ChatModel() { Uid = args.ClientId });
+        var userModel = JsonExtension.Deserialize<UserModel>(args.ClientId);
+        if (userModel == null)
+        {
+            return;
+        }    
+        onlineClientUids.Add(userModel);
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            ChatModels = onlineClientUids,
-            SendTime = DateTime.Now
+            userModels = onlineClientUids,
+            sendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);
     }
@@ -154,11 +170,16 @@ public class MqttService
     /// <param name="args"></param>
     private static void ClientDisConnected(MqttServerClientDisconnectedEventArgs args)
     {
-        onlineClientUids.Where(o => o.Uid != args.ClientId);
+        var userModel = JsonExtension.Deserialize<UserModel>(args.ClientId);
+        if (userModel == null)
+        {
+            return;
+        }
+        onlineClientUids.Where(o => o.uid != userModel.uid);
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            ChatModels = onlineClientUids,
-            SendTime = DateTime.Now
+            userModels = onlineClientUids,
+            sendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);
 
