@@ -14,7 +14,7 @@
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
-    <Grid>
+    <Grid MouseDown="Border_MouseDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="37" />
             <RowDefinition Height="*" />
@@ -22,10 +22,7 @@
 
         <!--<ui:TitleBar Background="#2e2e2e" Icon="{ui:SymbolIcon Symbol=Person24}" 
                      Title="Easy Chat" />-->
-
-        <!--#region // 托盘程序 //-->
-        <view:TrayView Grid.Row="0" />
-        <!--#endregion-->
+        <Grid Grid.Row="0"/>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -59,6 +56,10 @@
             <!--#endregion-->
 
             <Grid Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="237*"/>
+                    <ColumnDefinition Width="256*"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
                     <RowDefinition Height="2.5*" />
@@ -67,35 +68,38 @@
                     <RowDefinition Height="60" />
                 </Grid.RowDefinitions>
 
-                <ui:Card>
+                <ui:Card Grid.ColumnSpan="2">
                     <TextBlock Text="{Binding ChatObj.NickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </ui:Card>
 
                 <!-- Chat messages list -->
-                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" Grid.ColumnSpan="3"  />
-        
+                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" Grid.ColumnSpan="2" Margin="0,0,0,1" Grid.RowSpan="2"  />
+
                 <!--</TextBlock>-->
                 <GridSplitter Grid.Row="2"
                               Height="1"
-                              HorizontalAlignment="Stretch" />
+                              HorizontalAlignment="Stretch" Grid.ColumnSpan="2" Margin="0,0,0,125" Grid.RowSpan="2" />
                 <ui:TextBox Grid.Row="3"
                             TextWrapping="Wrap"
                             AcceptsReturn="True"
-                            Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="0,0,0,60" Grid.RowSpan="2">
                     <ui:TextBox.InputBindings>
                         <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
                     </ui:TextBox.InputBindings>
                 </ui:TextBox>
                 <ui:Button Grid.Row="4"
-                           Margin="5"
+                           Margin="0,0,5,5"
                            FontSize="24"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Bottom"
                            IsEnabled="{Binding SendMsg, Converter={StaticResource StringToBooleanConverter}}"
                            Icon="{ui:SymbolIcon Symbol=Send24}"
                            Command="{Binding SendCommand}"
-                           Content="发送" />
+                           Content="发送" Grid.Column="1" />
             </Grid>
         </Grid>
+        <!--#region // 托盘程序 //-->
+        <view:TrayView />
+        <!--#endregion-->
     </Grid>
 </ui:FluentWindow>

@@ -45,7 +45,7 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>~
+                            </TextBlock.Style>
                         </TextBlock>
 
                         <!-- Display time if not empty -->

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -38,6 +39,7 @@ public partial class MainViewModel : ObservableObject
         // 用户选择回调
         UserListVm.OnSelected += UserSelect;
 
+        _myClient.AddTopic(MqttContent.GROUP);
     }
 
     /// <summary>
@@ -89,48 +91,71 @@ public partial class MainViewModel : ObservableObject
         {
             if (newMsg.isGroupMsg)
             {
-                newMsg.groupName = newMsg.groupName == string.Empty ? "群聊" : newMsg.groupName;
-                if (_chatMessageDic.ContainsKey(newMsg.groupName))
-                {
-                    _chatMessageDic[newMsg.groupName].Add(chats);
-                    UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
-                }
-                else
-                {
-                    _chatMessageDic.Add(newMsg.groupName, new List<ChatMessage> { chats});
-                    var chatmodel = new ChatModel
-                    {
-                        
-                        Uid = newMsg.groupName,
-                        NickName = newMsg.groupName,
-                        Image = MqttContent.GetRandomImg(),
-                        IsGroup = true,
-                        Message = newMsg.message,
-                        TagName = "",
-                        MessageCount = 1
-                    };
-                    UserListVm.Users.Add(chatmodel);
-                }
+                DealGroupMessage(newMsg, chats);
             }
             else
             {
-                if (_chatMessageDic.ContainsKey(newMsg.userModel.uid))
-                {
-                    _chatMessageDic[newMsg.userModel.uid].Add(chats);
-                    UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
-                }
-                else
-                {
-                    _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
-                }
+                DealPersonMessage(newMsg, chats);
             }
-            if (!string.IsNullOrEmpty(ChatObj.NickName))
-            {       
-                ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[ChatObj.NickName]);
+            
+            if (!string.IsNullOrEmpty(ChatObj.Uid))
+            {
+                ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[ChatObj.Uid]);
             }
         });
     }
 
+    /// <summary>
+    /// 处理群消息
+    /// </summary>
+    /// <param name="newMsg"></param>
+    /// <param name="chats"></param>
+    private void DealGroupMessage(MsgModel newMsg, ChatMessage chats)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            newMsg.groupName = newMsg.groupName == string.Empty ? "群聊" : newMsg.groupName;
+            if (_chatMessageDic.ContainsKey(newMsg.groupName))
+            {
+                _chatMessageDic[newMsg.groupName].Add(chats);
+                UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+            }
+            else
+            {
+                _chatMessageDic.Add(newMsg.groupName, new List<ChatMessage> { chats });
+                var chatmodel = new ChatModel
+                {
+
+                    Uid = newMsg.groupName,
+                    NickName = newMsg.groupName,
+                    Image = MqttContent.GetRandomImg(),
+                    IsGroup = true,
+                    Message = newMsg.message,
+                    TagName = "",
+                    MessageCount = 1
+                };
+                UserListVm.Users.Add(chatmodel);
+            }
+        });
+    }
+    
+    /// <summary>
+    /// 处理私发消息
+    /// </summary>
+    /// <param name="newMsg"></param>
+    /// <param name="chats"></param>
+    private void DealPersonMessage(MsgModel newMsg, ChatMessage chats)
+    {
+        if (_chatMessageDic.ContainsKey(newMsg.userModel.uid))
+        {
+            _chatMessageDic[newMsg.userModel.uid].Add(chats);
+            UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
+        }
+        else
+        {
+            _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
+        }
+    }
     /// <summary>
     /// 将UserListVm.Users 和内存的消息合并
     /// 如果_chatModelDic=存在UserListVm.Users没有的用户，那么就是用户下线
@@ -143,19 +168,28 @@ public partial class MainViewModel : ObservableObject
 
     private void UserSelect(ChatModel chatModel)
     {
-        ChatObj.NickName = chatModel.NickName;
+        SendTopic = chatModel.Uid;
+        ChatObj = new ChatModel()
+        {
+            NickName = chatModel.NickName,
+            Uid = chatModel.Uid,
+            Image = chatModel.Image,
+            IsGroup = chatModel.IsGroup
+        };
         ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
     }
     #region Commands
     [RelayCommand]
     private void Send()
     {
+        var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
+        var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + SendTopic;
         try
         {
             if (!string.IsNullOrEmpty(SendMsg))
                 Task.Run(() =>
                 {
-                    _myClient.SendMsg(MqttContent.MESSAGE + SendTopic,
+                    _myClient.SendMsg(topic,
                         new MsgModel
                         {
                             userModel = new UserModel()
@@ -166,7 +200,7 @@ public partial class MainViewModel : ObservableObject
                             },
                             sendTime = DateTime.Now,
                             message = SendMsg,
-                            isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup
+                            isGroupMsg = isGroupMsg
                         });
                     SendMsg = "";
                 });

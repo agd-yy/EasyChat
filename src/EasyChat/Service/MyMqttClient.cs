@@ -173,9 +173,8 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
                 return;
             }
             // 全局消息 or 群消息
-            if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE))
+            if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE) || args.ApplicationMessage.Topic.Contains(MqttContent.GROUP))
             {
-                msgModel.isGroupMsg = true;
                 ReceiveMsgEvent?.Invoke(msgModel);
             }
             // 收到其他客户端在线消息
