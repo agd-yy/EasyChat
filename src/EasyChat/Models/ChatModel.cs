@@ -19,6 +19,10 @@ public partial class ChatModel : ObservableObject
     // 群组名，私聊就是对方的昵称
     [ObservableProperty] private string tagName = "";
 
-    // 当前聊天对象的uid等信息
-    [ObservableProperty] private UserModel userModel = new UserModel();
+    // 当前聊天对象的信息
+    [ObservableProperty] private string nickName = "";
+    [ObservableProperty] private string image = "";
+    [ObservableProperty] private string uid = "";
+    [ObservableProperty] private bool isOnline = true;
+    [ObservableProperty] private bool isGroup = false;
 }

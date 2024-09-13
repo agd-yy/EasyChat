@@ -33,7 +33,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     /// </summary>
     /// <param name="ip"></param>
     /// <returns></returns>
-    public async void StartClient(string ip, UserModel user)
+    public async void StartClient(string ip, ChatModel user)
     {
         // 创建Mqtt客户端工厂
         var factory = new MqttFactory();

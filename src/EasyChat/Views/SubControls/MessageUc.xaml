@@ -18,23 +18,51 @@
         </Style>
     </UserControl.Resources>
     <ListBox Name="MessageListBox" ItemsSource="{Binding Messages}">
-        
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <Border Name="UserBorder"
-                        Background="{Binding Color}"
-                        Height="40">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding UserModel.nickName}"
-                                   VerticalAlignment="Center"
-                                   Margin="20 0"/>
-                        <TextBlock Visibility="{Binding MessageCount, Converter={StaticResource UIntToVisibilityConverter}}">
-                            <Run Text="["/>
-                            <Run Text="{Binding MessageCount}"/>
-                            <Run Text="]"/>
+                <!-- Chat messages list -->
+                <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10">
+                    <StackPanel>
+                        <!-- Display nickName if not empty -->
+                        <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Blue" Margin="0,0,0,5">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NickName}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <!-- Display message -->
+                        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Message}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>~
+                        </TextBlock>
+
+                        <!-- Display time if not empty -->
+                        <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Time}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
                         </TextBlock>
                     </StackPanel>
                 </Border>
+
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>
