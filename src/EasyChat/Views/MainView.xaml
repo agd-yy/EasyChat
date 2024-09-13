@@ -20,9 +20,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Background="#2e2e2e"
-                     Icon="{ui:SymbolIcon Symbol=Person24}"
-                     Title="Easy Chat" />
+        <!--<ui:TitleBar Background="#2e2e2e" Icon="{ui:SymbolIcon Symbol=Person24}" 
+                     Title="Easy Chat" />-->
 
         <!--#region // 托盘程序 //-->
         <view:TrayView Grid.Row="0" />
@@ -37,14 +36,17 @@
             </Grid.ColumnDefinitions>
 
             <!--#region // 头像功能 //-->
-            <StackPanel Background="#2e2e2e"
-                        Grid.Column="0">
-                <ui:Button Height="50"
-                           Width="50"
-                           ToolTip="{Binding SubscribeUid}"
-                           Margin="0 2"
-                           HorizontalAlignment="Center"
-                           Icon="{ui:SymbolIcon Fluent24}" />
+            <StackPanel Background="#2e2e2e" >
+                <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 2" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.UserModel.nickName}" >
+                    <Ellipse Width="50" Height="50">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding MyChatModel.UserModel.image}" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Border>
+
             </StackPanel>
             <!--#endregion-->
 
@@ -53,12 +55,9 @@
             <!--#endregion-->
 
             <!--#region// 分割线 //-->
-            <GridSplitter Grid.Column="2"
-                          Width="1"
-                          VerticalAlignment="Stretch" />
+            <GridSplitter Grid.Column="2" Width="1" VerticalAlignment="Stretch" />
             <!--#endregion-->
 
-            <!--#region// 聊天窗口 //-->
             <Grid Grid.Column="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
@@ -69,11 +68,60 @@
                 </Grid.RowDefinitions>
 
                 <ui:Card>
-                    <TextBlock Text="Undefined" />
+                    <TextBlock Text="{Binding ChatObj.UserModel.nickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </ui:Card>
 
-                <TextBlock Grid.Row="1"
-                           Text="Content" />
+                <TextBlock Grid.Row="1">
+                    <!-- Chat messages list -->
+        <ListBox ItemsSource="{Binding ChatMessages.Messages}" 
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10">
+                            <StackPanel>
+                                <!-- Display nickName if not empty -->
+                                <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Blue" Margin="0,0,0,5">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NickName}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <!-- Display message -->
+                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Message}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                            <!-- Display time if not empty -->
+                            <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Time}" Value="">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+                </TextBlock>
                 <GridSplitter Grid.Row="2"
                               Height="1"
                               HorizontalAlignment="Stretch" />
@@ -95,226 +143,7 @@
                            Command="{Binding SendCommand}"
                            Content="发送" />
             </Grid>
-            <!--#endregion-->
 
-            <!--#region DISABLED-->
-            <!--background-->
-            <!--
-        <Border CornerRadius="0 20 20 0" Background="#f8f7fc" Grid.Column="1" Grid.ColumnSpan="2" Margin="-25 0 0 0" Grid.RowSpan="2" MouseDown="Border_MouseDown" MouseLeftButtonDown="Boreder_MouseLeftButtonDown"/>
-
-        -->
-            <!--left menu 1-->
-            <!--
-        <Border CornerRadius="20" Grid.RowSpan="2" Panel.ZIndex="2" Background="#6145e3">
-            <Grid>
-                -->
-            <!--App tittle-->
-            <!--
-                <TextBlock Text="Chat App" Foreground="#FFFFFF" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Center"
-                       FontWeight="SemiBold" Margin="0 30 0 0">
-                    <TextBlock.LayoutTransform>
-                        <RotateTransform Angle="90"/>
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
-
-                -->
-            <!--account buttons-->
-            <!--
-                <StackPanel Margin="0 170 0 0">
-                    -->
-            <!--add button-->
-            <!--
-                    <Button Style="{StaticResource leftSideButton}" Command = "{Binding NothingCommand}">
-                        <Border Background="Transparent" CornerRadius="3" Width="25" Height="25" BorderThickness="0.8"
-                            Margin="-3 0 0 0" BorderBrush="White">
-                            <Icon:PackIconMaterial Kind="Plus" Width="10" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        -->
-            <!--top section-->
-            <!--
-        <Grid Grid.Column="1" Grid.ColumnSpan="2" Margin="40 30">
-            -->
-            <!--search textbox-->
-            <!--
-            <Grid Width="250"   HorizontalAlignment="Left">
-                <Rectangle Width="1" Fill="#e9e9e9" Panel.ZIndex="2" HorizontalAlignment="Left" Margin="130 19 0 19"/>
-                <TextBlock Margin="150 0 20 0" VerticalAlignment="Center" Foreground="#868686" Panel.ZIndex="1"
-                       IsHitTestVisible="False" Text="Search here ..." 
-                       Visibility="{Binding ElementName=txtboxSearch,Converter={StaticResource BoolTovis}}"/>
-                <TextBox x:Name="txtboxSearch" Style="{StaticResource searchTextbox}"/>
-                <Button HorizontalAlignment="Right" Margin="0 0 7 0" Style="{StaticResource textBoxButton}"
-                       Command = "{Binding NothingCommand}">
-                    <Icon:PackIconMaterial Kind="Magnify" Width="15" Foreground="#c7c7c7"/>
-                </Button>
-            </Grid>
-
-            -->
-            <!--top menu-->
-            <!--
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource textBoxButton}" Click="Minimize">
-                    <Icon:PackIconMaterial Kind="WindowMinimize" Foreground="#88878e"/>
-                </Button>
-                <Button Style="{StaticResource textBoxButton}" Click="Maximize">
-                    <Icon:PackIconMaterial Kind="WindowMaximize" Foreground="#88878e"/>
-                </Button>
-                <Button Style="{StaticResource textBoxButton}" Click="OnClose">
-                    <Icon:PackIconMaterial Kind ="Close"  Foreground="#88878e"/>
-                </Button>
-            </StackPanel>
-        </Grid>
-
-        -->
-            <!--chat items section-->
-            <!--
-        <Border Grid.Column="1" Grid.Row="1">
-            <Grid>
-                -->
-            <!--seprator-->
-            <!--
-                <StackPanel Orientation="Horizontal" Margin="30 0 0 30">
-                    <Rectangle Width="0.8" Stroke="#dadada" VerticalAlignment="Stretch"/>
-                </StackPanel>
-
-                -->
-            <!--group items-->
-            <!--
-                <StackPanel Margin="30 0 15 0">
-                    -->
-            <!--<TextBlock Text="Groups" Margin="25 0 0 5" Style="{StaticResource titleText}"/>-->
-            <!--
-                    <ItemsControl ItemsSource="{Binding ChatUsers}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <uc:Item Title="{Binding NickName}" 
-                                 Message="{Binding Message}" 
-                                 Color="{Binding Color}" 
-                                 TagName="{Binding TagName}" 
-                                 MessageCount="{Binding MessageCount}" 
-                                 Image="{Binding Image}"/>  
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Grid>
-        </Border>
-        
-        -->
-            <!--chat section-->
-            <!--
-        <Border CornerRadius="15" Background="#ffffff" Grid.Column="2" Grid.Row="1" Margin="0 0 30 30" ClipToBounds="True">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="6*"/>
-                    <RowDefinition Height="74*"/>
-                    <RowDefinition Height="10*"/>
-                </Grid.RowDefinitions>
-
-                -->
-            <!--Top chat menubar-->
-            <!--
-                <Grid Background="#ffffff">
-                    <Grid.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="1" Direction="-90" Opacity="0.1"/>
-                    </Grid.Effect>
-
-                    <TextBlock Text="Moonlab Std" FontSize="16" Margin="20 15" HorizontalAlignment="Left"/>
-
-                    <StackPanel Orientation="Horizontal" Margin="0 0 10 0" HorizontalAlignment="Right">
-                        <TextBlock Text=" " VerticalAlignment="Center" Margin="7 0" Foreground="#8b8a8f" FontSize="11"/>
-                        <Button Style="{StaticResource textBoxButton}" Command = "{Binding NothingCommand}">
-                            <Icon:PackIconMaterial Kind="DotsVertical" Width="14" Height="14" Foreground="#88878e"/>
-                        </Button>
-                    </StackPanel>
-                </Grid>
-
-                <Grid Grid.Row="1" Margin="10 0">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding ChatMessages}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                        -->
-            <!-- Chat Separator -->
-            <!--
-                                        <uc:Chat_Seprator Title="{Binding SeparatorTitle}" Visibility="{Binding SeparatorTitle, Converter={StaticResource NullToVisibilityConverter}}" />
-                                        -->
-            <!-- User Chat -->
-            <!--
-                                        <uc:UserChat Username="{Binding NickName}" Image="{Binding Image}" Visibility="{Binding NickName, Converter={StaticResource NullToVisibilityConverter}}"/>
-                                        -->
-            <!-- Message Chat -->
-            <!--
-                                        <uc:Messagechat Color="{Binding Color}" Message="{Binding Message}" Visibility="{Binding Message, Converter={StaticResource NullToVisibilityConverter}}"/>
-                                        -->
-            <!-- Message Time -->
-            <!--
-                                        <TextBlock Text="{Binding Time}" Style="{StaticResource timeText}" Visibility="{Binding Time, Converter={StaticResource NullToVisibilityConverter}}" />
-                                        -->
-            <!-- My Message Chat -->
-            <!--
-                                        <uc:MyMessageChat Message="{Binding Message}" Visibility="{Binding IsMyMessage, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
-
-                -->
-            <!--bottom message section-->
-            <!--
-                <Grid Grid.Row="2" Margin="10 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    -->
-            <!--message textbox-->
-            <!--
-                    <Grid>
-                        <TextBlock Margin="15 0 120 0" VerticalAlignment="Center" Foreground="#868686" Panel.ZIndex="1"
-                               IsHitTestVisible="False" 
-                               Visibility="{Binding ElementName=txtMessage,Converter={StaticResource BoolTovis}}"/>
-                        <TextBox x:Name="txtMessage" Style="{StaticResource messageTextbox}" 
-                                MaxHeight="100" Text="{Binding SendMsg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-
-                        -->
-            <!--buttons-->
-            <!--<StackPanel Orientation="Horizontal" Margin="0 0 8 0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button Style="{StaticResource textBoxButton}" Margin="0 0 1 0">
-                                <Icon:PackIconMaterial Kind="BookmarkMultipleOutline" Width="12" Foreground="#a6a6a6"/>
-                            </Button>
-                            <Button Style="{StaticResource textBoxButton}">
-                                <Icon:PackIconMaterial Kind="Paperclip" Width="12" Foreground="#a6a6a6"/>
-                            </Button>
-                            <Button Style="{StaticResource textBoxButton}">
-                                <Icon:PackIconMaterial Kind="MicrophoneOutline" Width="12" Foreground="#a6a6a6"/>
-                            </Button>
-                        </StackPanel>-->
-            <!--
-                    </Grid>
-
-                    -->
-            <!--sendbutton-->
-            <!--
-                    <Button Grid.Column="1" Margin="5 0 0 0" Style="{StaticResource textBoxButton}"  Command="{Binding SendCommand}">
-                        <Icon:PackIconMaterial Kind="Send" Margin="3 0 0 2" Width="16" Foreground="#6f59d4">
-                            <Icon:PackIconMaterial.LayoutTransform>
-                                <RotateTransform Angle="-45"/>
-                            </Icon:PackIconMaterial.LayoutTransform>
-                        </Icon:PackIconMaterial>
-                    </Button>
-                </Grid>
-            </Grid>
-        </Border>-->
-            <!--#endregion-->
         </Grid>
 
     </Grid>

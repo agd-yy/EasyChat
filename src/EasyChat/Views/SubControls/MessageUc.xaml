@@ -17,7 +17,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <ListBox Name="MessageListBox" ItemsSource="{Binding Users}">
+    <ListBox Name="MessageListBox" ItemsSource="{Binding Messages}">
         
         <ListBox.ItemTemplate>
             <DataTemplate>
@@ -35,14 +35,6 @@
                         </TextBlock>
                     </StackPanel>
                 </Border>
-                <DataTemplate.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter TargetName="UserBorder" Property="Background" Value="#cfcfcf" />
-                    </Trigger>
-                    <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" Value="True">
-                        <Setter TargetName="UserBorder" Property="Background" Value="#c4c4c5" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>
