@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\Images\p1.ico" />
       <None Remove="Resources\Images\p1.jpg" />
       <None Remove="Resources\Images\p10.jpg" />
       <None Remove="Resources\Images\p11.jpg" />

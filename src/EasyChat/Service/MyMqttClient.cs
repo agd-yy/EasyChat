@@ -52,12 +52,15 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             await MqttClient.ConnectAsync(options);
             if (MqttClient.IsConnected)
             {
-                ReceiveMsgEvent?.Invoke(new MsgModel { message = "连接服务器成功", sendTime = DateTime.Now});
+                ReceiveMsgEvent?.Invoke(new MsgModel { 
+                    userModel = new UserModel { uid = MyClientUid },
+                    message = "连接服务器成功", sendTime = DateTime.Now});
             }
         }
         catch
         {
-            ReceiveMsgEvent?.Invoke(new MsgModel { message = "连接服务器失败", sendTime = DateTime.Now});
+            ReceiveMsgEvent?.Invoke(new MsgModel {
+                userModel = new UserModel { uid = MyClientUid },message = "连接服务器失败", sendTime = DateTime.Now});
         }
 
         // 订阅主题
@@ -71,13 +74,13 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             {
                 // 重新连接
                 await MqttClient.ConnectAsync(options);
-                if (MqttClient.IsConnected) ReceiveMsgEvent?.Invoke(new MsgModel { message = "重新连接服务器成功", sendTime = DateTime.Now});
+                if (MqttClient.IsConnected) ReceiveMsgEvent?.Invoke(new MsgModel { userModel = new UserModel { uid = MyClientUid }, message = "重新连接服务器成功", sendTime = DateTime.Now});
                 // 重新订阅
                 InitSubTopic();
             }
             catch
             {
-                ReceiveMsgEvent?.Invoke(new MsgModel { message = "重连服务器失败", sendTime = DateTime.Now});
+                ReceiveMsgEvent?.Invoke(new MsgModel { userModel = new UserModel { uid = MyClientUid },message = "重连服务器失败", sendTime = DateTime.Now});
             }
         });
     }

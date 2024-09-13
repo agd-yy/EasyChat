@@ -21,7 +21,4 @@ public partial class ChatModel : ObservableObject
 
     // 当前聊天对象的uid等信息
     [ObservableProperty] private UserModel userModel = new UserModel();
-
-    //  当前聊天对象对应的全部聊天信息
-    //[ObservableProperty] private List<ChatMessage> chatMessages = new List<ChatMessage>();
 }

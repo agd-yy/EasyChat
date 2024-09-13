@@ -9,5 +9,6 @@ namespace EasyChat.Models
         public string uid { get; set; } = "";
 
         public bool isOnline { get; set; } = true;
+        public bool isGroup { get; set; } = false;
     }
 }
