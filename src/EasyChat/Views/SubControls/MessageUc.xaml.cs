@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 
 namespace EasyChat.Views.SubControls
 {
@@ -23,6 +10,14 @@ namespace EasyChat.Views.SubControls
         public MessageUc()
         {
             InitializeComponent();
+            MessageListBox.Items.CurrentChanged += (s, e) =>
+            {
+                if (MessageListBox.Items.Count > 0)
+                {
+                    MessageListBox.ScrollIntoView(MessageListBox.Items[MessageListBox.Items.Count - 1]);
+                }
+            };
         }
     }
+
 }

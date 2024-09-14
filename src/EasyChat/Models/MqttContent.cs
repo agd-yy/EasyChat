@@ -7,10 +7,10 @@ public static class MqttContent
 {
     // 1.主题订阅相关
     // 上线 客户端上线发送/客户端订阅
-    public const string ONLINE = "group/online";
+    public const string ONLINE = "message/online";
 
     // 其他客户端寻求在线客户端
-    public const string WHO_ONLINE = "group/whoOnline";
+    public const string WHO_ONLINE = "message/whoOnline";
 
     // 分组
     public const string GROUP = "group/";

@@ -12,7 +12,6 @@ public class MqttService
     private static readonly MqttService mqttService = new();
     private static IMqttServer? server;
     // 记录当前在线客户端
-    //private static HashSet<string> onlineClientUids = [];
     private static List<UserModel> onlineClientUids = [];
 
     private MqttService()

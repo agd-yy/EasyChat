@@ -1,4 +1,5 @@
 using System.Text;
+using EasyChat.Controls;
 using EasyChat.Extensions;
 using EasyChat.Models;
 using EasyChat.Utilities;
@@ -159,7 +160,14 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             .WithRetainFlag()
             .Build();
 
-        await MqttClient.PublishAsync(message);
+        try
+        {
+            await MqttClient.PublishAsync(message);
+        }
+        catch
+        {
+            EcMsgBox.Show("服务器似乎连接不上~");
+        }
     }
 
     private void HandleMSG(MqttApplicationMessageReceivedEventArgs args)

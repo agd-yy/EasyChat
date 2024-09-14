@@ -16,53 +16,131 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- 消息气泡样式 -->
+        <Style x:Key="MessageBubbleStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="LightGray"/>
+            <Style.Triggers>
+                <!-- 根据 isMyMessage 修改背景色 -->
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                </DataTrigger>
+                <!-- 根据 isMyMessage 修改对齐方式 -->
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="False">
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- 头像样式（圆形头像） -->
+        <Style x:Key="AvatarStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!-- 左侧头像样式 -->
+        <Style x:Key="LeftAvatarStyle" TargetType="Border" BasedOn="{StaticResource AvatarStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 右侧头像样式 -->
+        <Style x:Key="RightAvatarStyle" TargetType="Border" BasedOn="{StaticResource AvatarStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
-    <ListBox Name="MessageListBox" ItemsSource="{Binding Messages}">
+
+    <!-- 聊天消息列表 -->
+    <ListBox Name="MessageListBox" ItemsSource="{Binding Messages}" 
+             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <!-- Chat messages list -->
-                <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="10">
-                    <StackPanel>
-                        <!-- Display nickName if not empty -->
-                        <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Blue" Margin="0,0,0,5">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding NickName}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <!-- Display message -->
-                        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Message}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                <!-- 使用Grid控制头像和消息气泡的布局 -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- 左边头像 -->
+                    <Border Grid.Column="0" Style="{StaticResource LeftAvatarStyle}">
+                        <Ellipse Width="50" Height="50">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="{Binding Image}" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Border>
+                    <!-- 消息气泡 -->
+                    <Border Grid.Column="1" Style="{StaticResource MessageBubbleStyle}">
+                        <StackPanel Orientation="Vertical">
+                            <!-- 昵称 -->
+                            <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Pink" Margin="0,0,0,5">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NickName}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
-                        <!-- Display time if not empty -->
-                        <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Time}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            <!-- 消息文本 -->
+                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Message}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
+                            <!-- 时间 -->
+                            <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Time}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 右边头像 -->
+                    <Border Grid.Column="2" Style="{StaticResource RightAvatarStyle}">
+                        <Ellipse Width="50" Height="50">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="{Binding Image}" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Border>
+                </Grid>
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>

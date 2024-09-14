@@ -66,6 +66,10 @@ public partial class MainViewModel : ObservableObject
                     IsOnline = userModel.isOnline,
                     IsGroup = userModel.isGroup
                 });
+                if (!_chatMessageDic.ContainsKey(userModel.uid))
+                {
+                    _chatMessageDic.Add(userModel.uid, new List<ChatMessage>());
+                }
             }
             UserOrGroupCombine();
         });
@@ -82,7 +86,7 @@ public partial class MainViewModel : ObservableObject
         ChatMessage chats = new ChatMessage
         {
             NickName = newMsg.userModel.nickName,
-            Image = newMsg.userModel.image,
+            Image = string.IsNullOrEmpty(newMsg.userModel.image) ? MqttContent.GetRandomImg() : newMsg.userModel.image,
             Message = newMsg.message,
             Time = newMsg.sendTime.ToString(),
             IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid
@@ -184,24 +188,24 @@ public partial class MainViewModel : ObservableObject
     {
         var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
         var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + SendTopic;
+        var msgModel = new MsgModel
+        {
+            userModel = new UserModel()
+            {
+                uid = MyChatModel.Uid,
+                nickName = MyChatModel.NickName,
+                image = MyChatModel.Image
+            },
+            sendTime = DateTime.Now,
+            message = SendMsg,
+            isGroupMsg = isGroupMsg
+        };
         try
         {
             if (!string.IsNullOrEmpty(SendMsg))
                 Task.Run(() =>
                 {
-                    _myClient.SendMsg(topic,
-                        new MsgModel
-                        {
-                            userModel = new UserModel()
-                            {
-                                uid = MyChatModel.Uid,
-                                nickName = MyChatModel.NickName,
-                                image = MyChatModel.Image
-                            },
-                            sendTime = DateTime.Now,
-                            message = SendMsg,
-                            isGroupMsg = isGroupMsg
-                        });
+                    _myClient.SendMsg(topic, msgModel);
                     SendMsg = "";
                 });
         }
