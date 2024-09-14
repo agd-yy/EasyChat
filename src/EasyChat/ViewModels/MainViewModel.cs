@@ -162,12 +162,17 @@ public partial class MainViewModel : ObservableObject
     }
     /// <summary>
     /// 将UserListVm.Users 和内存的消息合并
-    /// 如果_chatModelDic=存在UserListVm.Users没有的用户，那么就是用户下线
     /// </summary>
     private void UserOrGroupCombine()
     {
-        
-
+        // 如果_chatModelDic=存在UserListVm.Users没有的用户，那么就是用户下线
+        foreach (var key in _chatMessageDic.Keys)
+        {
+            if (!UserListVm.Users.Any(x => x.Uid == key))
+            {
+                _chatMessageDic.Remove(key);
+            }
+        }
     }
 
     private void UserSelect(ChatModel chatModel)
@@ -186,28 +191,46 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Send()
     {
-        var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
-        var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + SendTopic;
-        var msgModel = new MsgModel
-        {
-            userModel = new UserModel()
-            {
-                uid = MyChatModel.Uid,
-                nickName = MyChatModel.NickName,
-                image = MyChatModel.Image
-            },
-            sendTime = DateTime.Now,
-            message = SendMsg,
-            isGroupMsg = isGroupMsg
-        };
         try
         {
             if (!string.IsNullOrEmpty(SendMsg))
-                Task.Run(() =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
                 {
+                    var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
+                    var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + SendTopic;
+                    var msgModel = new MsgModel
+                    {
+                        userModel = new UserModel()
+                        {
+                            uid = MyChatModel.Uid,
+                            nickName = MyChatModel.NickName,
+                            image = MyChatModel.Image
+                        },
+                        sendTime = DateTime.Now,
+                        message = SendMsg,
+                        isGroupMsg = isGroupMsg
+                    };
                     _myClient.SendMsg(topic, msgModel);
+                    if (!isGroupMsg)
+                    {
+                        if (_chatMessageDic.ContainsKey(SendTopic))
+                        {
+                            _chatMessageDic[SendTopic].Add(new ChatMessage
+                            {
+                                NickName = MyChatModel.NickName,
+                                Image = MyChatModel.Image,
+                                Message = msgModel.message,
+                                Time = msgModel.sendTime.ToString(),
+                                IsMyMessage = true
+                            });
+                            UserListVm.Users.Where(x => x.Uid == SendTopic).First().MessageCount = 0;
+                            ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[SendTopic]);
+                        }
+                    }
                     SendMsg = "";
                 });
+            }
         }
         catch (Exception ex)
         {
