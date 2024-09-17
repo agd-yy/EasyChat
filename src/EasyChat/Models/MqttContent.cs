@@ -14,18 +14,14 @@ public static class MqttContent
 
     // 分组
     public const string GROUP = "group/";
-
     // 消息
     public const string MESSAGE = "message/";
-    public const string MESSAGE_ALL = "message/#";
 
     // 2.其他
-    // 分割消息与用户名的字符
-    public const char SUB_STRING = '$';
-
     public const int SERVER_PORT = 1883;
     public const string SERVER_USER = "Doctor";
     public const string SERVER_PW = "233";
+    public const string OFFLINE_STRING = "(已离线)";
 
     // 生成随机头像用
     public static string GetRandomImg()
@@ -34,7 +30,7 @@ public static class MqttContent
         return "/Resources/Images/p" + _random.Next(1, 13) + ".jpg";
     }
 
-    // message/# (全局消息)； message/自己UID (别人发送给自己的消息)
+    // message/自己UID (别人发送给自己的消息)
     // 界面优化；消息提醒（闪烁或者声音提醒）；聊天页面按用户分组；点击在线用户进入聊天界面
 
 

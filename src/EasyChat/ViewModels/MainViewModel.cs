@@ -62,7 +62,7 @@ public partial class MainViewModel : ObservableObject
                     GroupName = userModel.nickName,
                     Uid = userModel.uid,
                     Image = userModel.image,
-                    NickName = userModel.nickName,
+                    NickName = userModel.isOnline? userModel.nickName : userModel.nickName + MqttContent.OFFLINE_STRING,
                     IsOnline = userModel.isOnline,
                     IsGroup = userModel.isGroup
                 });
@@ -71,7 +71,6 @@ public partial class MainViewModel : ObservableObject
                     _chatMessageDic.Add(userModel.uid, new List<ChatMessage>());
                 }
             }
-            UserOrGroupCombine();
         });
     }
 
@@ -160,32 +159,28 @@ public partial class MainViewModel : ObservableObject
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
     }
-    /// <summary>
-    /// 将UserListVm.Users 和内存的消息合并
-    /// </summary>
-    private void UserOrGroupCombine()
-    {
-        // 如果_chatModelDic=存在UserListVm.Users没有的用户，那么就是用户下线
-        foreach (var key in _chatMessageDic.Keys)
-        {
-            if (!UserListVm.Users.Any(x => x.Uid == key))
-            {
-                _chatMessageDic.Remove(key);
-            }
-        }
-    }
 
     private void UserSelect(ChatModel chatModel)
     {
-        SendTopic = chatModel.Uid;
-        ChatObj = new ChatModel()
+        if (chatModel == null)
         {
-            NickName = chatModel.NickName,
-            Uid = chatModel.Uid,
-            Image = chatModel.Image,
-            IsGroup = chatModel.IsGroup
-        };
-        ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
+            return;
+        }
+        try
+        {
+            SendTopic = chatModel.Uid;
+            ChatObj = new ChatModel()
+            {
+                NickName = chatModel.NickName,
+                Uid = chatModel.Uid,
+                Image = chatModel.Image,
+                IsGroup = chatModel.IsGroup
+            };
+            ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
+        }
+        catch (Exception)
+        {
+        }
     }
     #region Commands
     [RelayCommand]
@@ -212,7 +207,7 @@ public partial class MainViewModel : ObservableObject
                         isGroupMsg = isGroupMsg
                     };
                     _myClient.SendMsg(topic, msgModel);
-                    if (!isGroupMsg)
+                    if (!isGroupMsg && !MyChatModel.Uid.Equals(SendTopic))
                     {
                         if (_chatMessageDic.ContainsKey(SendTopic))
                         {
@@ -268,7 +263,6 @@ public partial class MainViewModel : ObservableObject
     ///     发送主题
     /// </summary>
     [ObservableProperty] private string _sendTopic = string.Empty;
-
 
     /// <summary>
     ///     用户

@@ -26,7 +26,6 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         _topicSet.Add(MqttContent.WHO_ONLINE);
         _topicSet.Add(MqttContent.ONLINE);
         _topicSet.Add(MqttContent.MESSAGE + MyClientUid);
-        _topicSet.Add(MqttContent.MESSAGE_ALL);
     }
 
     /// <summary>

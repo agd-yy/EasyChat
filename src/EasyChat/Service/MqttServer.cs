@@ -169,12 +169,13 @@ public class MqttService
     /// <param name="args"></param>
     private static void ClientDisConnected(MqttServerClientDisconnectedEventArgs args)
     {
-        var userModel = JsonExtension.Deserialize<UserModel>(args.ClientId);
+        var userModel = JsonExtension.Deserialize<ChatModel>(args.ClientId);
         if (userModel == null)
         {
             return;
         }
-        onlineClientUids.Where(o => o.uid != userModel.uid);
+        // 从 onlineClientUids中获取uid == userModel.uid的对象，然后修改isOnline状态
+        onlineClientUids.Where(o => o.uid == userModel.Uid).First().isOnline = false;
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
             userModels = onlineClientUids,
