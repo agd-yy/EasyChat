@@ -71,6 +71,7 @@ public partial class MainViewModel : ObservableObject
                     _chatMessageDic.Add(userModel.uid, new List<ChatMessage>());
                 }
             }
+            UserListVm.Users = new BindingList<ChatModel>(UserListVm.Users.OrderByDescending(m => m.Uid == MyChatModel.Uid).ThenBy(m => m.Uid).ToList());
         });
     }
 
@@ -121,7 +122,10 @@ public partial class MainViewModel : ObservableObject
             if (_chatMessageDic.ContainsKey(newMsg.groupName))
             {
                 _chatMessageDic[newMsg.groupName].Add(chats);
-                UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+                if (newMsg.groupName != ChatObj.Uid)
+                {
+                    UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+                }
             }
             else
             {
@@ -139,6 +143,7 @@ public partial class MainViewModel : ObservableObject
                 };
                 UserListVm.Users.Add(chatmodel);
             }
+            UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;
         });
     }
     
@@ -152,12 +157,16 @@ public partial class MainViewModel : ObservableObject
         if (_chatMessageDic.ContainsKey(newMsg.userModel.uid))
         {
             _chatMessageDic[newMsg.userModel.uid].Add(chats);
-            UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
+            if (newMsg.userModel.uid != ChatObj.Uid)
+            {
+                UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
+            }
         }
         else
         {
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
+        UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
     }
 
     private void UserSelect(ChatModel chatModel)
@@ -169,12 +178,14 @@ public partial class MainViewModel : ObservableObject
         try
         {
             SendTopic = chatModel.Uid;
+            chatModel.MessageCount = 0;
             ChatObj = new ChatModel()
             {
                 NickName = chatModel.NickName,
                 Uid = chatModel.Uid,
                 Image = chatModel.Image,
-                IsGroup = chatModel.IsGroup
+                IsGroup = chatModel.IsGroup,
+                MessageCount = 0
             };
             ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
         }
@@ -220,6 +231,7 @@ public partial class MainViewModel : ObservableObject
                                 IsMyMessage = true
                             });
                             UserListVm.Users.Where(x => x.Uid == SendTopic).First().MessageCount = 0;
+                            UserListVm.Users.Where(x => x.Uid == SendTopic).First().Message = msgModel.message;
                             ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[SendTopic]);
                         }
                     }
@@ -229,7 +241,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            EcMsgBox.Show(ex.Message);
         }
     }
 
@@ -269,7 +281,7 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     [ObservableProperty] private ChatModel _myChatModel = new ChatModel();
     /// <summary>
-    ///     当前聊天对象的昵称
+    ///     当前聊天对象
     /// </summary>
     [ObservableProperty] private ChatModel _chatObj = new ChatModel();
 

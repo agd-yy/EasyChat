@@ -42,8 +42,10 @@
                             <ImageBrush ImageSource="{Binding MyChatModel.Image}" />
                         </Ellipse.Fill>
                     </Ellipse>
+                    <Border.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding NothingCommand}" />
+                    </Border.InputBindings>
                 </Border>
-
             </StackPanel>
             <!--#endregion-->
 

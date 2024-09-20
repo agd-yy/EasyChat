@@ -25,22 +25,63 @@
                 <i:InvokeCommandAction Command="{Binding SelectedCommand}"
                                        CommandParameter="{Binding ElementName=UserListBox, Path=SelectedItem}" />
             </i:EventTrigger>
+            <!--<i:EventTrigger EventName="MouseRightButtonDown">
+                <i:InvokeCommandAction Command="{Binding RightClickCommand}"
+                                       CommandParameter="{Binding ElementName=UserListBox, Path=SelectedItem}" />
+            </i:EventTrigger>-->
         </i:Interaction.Triggers>
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <Border Name="UserBorder"
-                        Background="{Binding Color}"
-                        Height="40">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding NickName}"
-                                   VerticalAlignment="Center"
-                                   Margin="20 0"/>
-                        <TextBlock Visibility="{Binding MessageCount, Converter={StaticResource UIntToVisibilityConverter}}">
-                            <Run Text="["/>
-                            <Run Text="{Binding MessageCount}"/>
-                            <Run Text="]"/>
-                        </TextBlock>
-                    </StackPanel>
+                <Border Name="UserBorder" Background="{Binding Color}" Height="50">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition  Height="25"/>
+                            <RowDefinition  Height="25"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Column="0" Grid.RowSpan="2">
+                            <Ellipse Width="40" Height="40" >
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="{Binding Image}" />
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="0">
+                            <StackPanel Orientation="Vertical" >
+                                <TextBlock Text="{Binding NickName}" 
+                                     VerticalAlignment="Center" FontWeight="Bold"  Padding="3" FontSize="16"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="1">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding Message}" VerticalAlignment="Center" FontSize="12" Foreground="Gray"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 右侧MessageCount圆形气泡 -->
+                        <Border Grid.Column="2" Grid.RowSpan="2" Background="Red" Width="25"  Height="25"
+                            CornerRadius="12.5" HorizontalAlignment="Right"
+                            VerticalAlignment="Center" >
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MessageCount}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding MessageCount}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="White"/>
+                        </Border>
+                    </Grid>
                 </Border>
                 <DataTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
