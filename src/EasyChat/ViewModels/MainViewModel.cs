@@ -1,9 +1,9 @@
-using System;
 using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasyChat.Controls;
+using EasyChat.Handle;
 using EasyChat.Models;
 using EasyChat.Service;
 using EasyChat.Utilities;
@@ -15,6 +15,8 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private readonly LoginViewModel _loginViewModel = Singleton<LoginViewModel>.Instance;
+    private EventHelper _eventHelper = EventHelper.Instance;
+    private int _allMessageCount = 0;
     // <uid , uid对应全部消息>
     private readonly Dictionary<string, List<ChatMessage>> _chatMessageDic = new Dictionary<string, List<ChatMessage>>();
 
@@ -125,6 +127,8 @@ public partial class MainViewModel : ObservableObject
                 if (newMsg.groupName != ChatObj.Uid)
                 {
                     UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+                    _allMessageCount++;
+                    _eventHelper.StartBlink();
                 }
             }
             else
@@ -141,6 +145,7 @@ public partial class MainViewModel : ObservableObject
                     TagName = "",
                     MessageCount = 1
                 };
+                _allMessageCount++;
                 UserListVm.Users.Add(chatmodel);
             }
             UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;
@@ -160,6 +165,8 @@ public partial class MainViewModel : ObservableObject
             if (newMsg.userModel.uid != ChatObj.Uid)
             {
                 UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
+                _allMessageCount++;
+                _eventHelper.StartBlink();
             }
         }
         else
@@ -178,6 +185,11 @@ public partial class MainViewModel : ObservableObject
         try
         {
             SendTopic = chatModel.Uid;
+            _allMessageCount -= chatModel.MessageCount;
+            if(_allMessageCount == 0)
+            {
+                _eventHelper.StopBlink();
+            }
             chatModel.MessageCount = 0;
             ChatObj = new ChatModel()
             {
@@ -193,6 +205,7 @@ public partial class MainViewModel : ObservableObject
         {
         }
     }
+
     #region Commands
     [RelayCommand]
     private void Send()

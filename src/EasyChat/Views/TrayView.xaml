@@ -17,7 +17,7 @@
         <s:BindingProxy x:Key="Vm" Data="{Binding}" />
         <s:BindingProxy x:Key="View" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
     </UserControl.Resources>
-    <tray:NotifyIcon Icon="/Resources/favicon.ico"
+    <tray:NotifyIcon Icon="/Resources/favicon.ico" 
                      ToolTip="EasyChat">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="LeftClick">

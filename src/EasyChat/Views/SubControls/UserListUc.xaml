@@ -36,12 +36,12 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition  Height="25"/>
-                            <RowDefinition  Height="25"/>
+                            <RowDefinition  Height="*"/>
+                            <RowDefinition  Height="*"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Column="0" Grid.RowSpan="2">
@@ -65,7 +65,7 @@
 
                         <!-- 右侧MessageCount圆形气泡 -->
                         <Border Grid.Column="2" Grid.RowSpan="2" Background="Red" Width="25"  Height="25"
-                            CornerRadius="12.5" HorizontalAlignment="Right"
+                            CornerRadius="12.5" HorizontalAlignment="Right" Margin="5"
                             VerticalAlignment="Center" >
                             <Border.Style>
                                 <Style TargetType="Border">
