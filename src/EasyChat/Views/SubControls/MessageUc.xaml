@@ -80,6 +80,11 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <!-- 左边头像 -->
                     <Border Grid.Column="0" Style="{StaticResource LeftAvatarStyle}">
                         <Ellipse Width="50" Height="50">

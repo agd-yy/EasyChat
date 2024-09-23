@@ -20,23 +20,31 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--<ui:TitleBar Background="#2e2e2e" Icon="{ui:SymbolIcon Symbol=Person24}" 
-                     Title="Easy Chat" />-->
-        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Grid.Row="0"/>
+        <Grid Grid.Row="0">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" >
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button 
+                            VerticalAlignment="Bottom" IsEnabled="{Binding CloseCommand, Converter={StaticResource StringToBooleanConverter}}"
+                                Icon="{ui:SymbolIcon Symbol=FullScreenMaximize16}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+                    <ui:Button Icon="{ui:SymbolIcon Symbol=FullScreenMaximize16}"
+                            Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+                </StackPanel>
+            </Border>
+        </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" MinWidth="200"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" MinWidth="300"/>
             </Grid.ColumnDefinitions>
 
             <!--#region // 头像功能 //-->
             <StackPanel Background="#2e2e2e" >
-                <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 2" 
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.NickName}" >
+                <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 2"  Grid.Column="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.NickName}" >
                     <Ellipse Width="50" Height="50">
                         <Ellipse.Fill>
                             <ImageBrush ImageSource="{Binding MyChatModel.Image}" />
@@ -50,7 +58,7 @@
             <!--#endregion-->
 
             <!--#region// 聊天列表 //-->
-            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" Grid.ColumnSpan="3" Margin="5,6,489,-6" />
+            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" />
             <!--#endregion-->
 
             <!--#region// 分割线 //-->
@@ -58,10 +66,6 @@
             <!--#endregion-->
 
             <Grid Grid.Column="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="237*"/>
-                    <ColumnDefinition Width="256*"/>
-                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
                     <RowDefinition Height="2.5*" />
@@ -70,17 +74,15 @@
                     <RowDefinition Height="60" />
                 </Grid.RowDefinitions>
 
-                <ui:Card Grid.ColumnSpan="2">
+                <ui:Card Grid.Row="0">
                     <TextBlock Text="{Binding ChatObj.NickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </ui:Card>
 
                 <!-- Chat messages list -->
-                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" Grid.ColumnSpan="2" Margin="0,0,0,1" Grid.RowSpan="2"  />
+                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" />
 
                 <!--</TextBlock>-->
-                <GridSplitter Grid.Row="2"
-                              Height="1"
-                              HorizontalAlignment="Stretch" Grid.ColumnSpan="2" Margin="0,0,0,125" Grid.RowSpan="2" />
+                <GridSplitter Grid.Row="2" Height="1" HorizontalAlignment="Stretch" />
                 <ui:TextBox Grid.Row="3"
                             TextWrapping="Wrap"
                             AcceptsReturn="True"

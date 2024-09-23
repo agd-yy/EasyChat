@@ -25,10 +25,10 @@
                 <i:InvokeCommandAction Command="{Binding SelectedCommand}"
                                        CommandParameter="{Binding ElementName=UserListBox, Path=SelectedItem}" />
             </i:EventTrigger>
-            <!--<i:EventTrigger EventName="MouseRightButtonDown">
+            <i:EventTrigger EventName="MouseRightButtonDown">
                 <i:InvokeCommandAction Command="{Binding RightClickCommand}"
                                        CommandParameter="{Binding ElementName=UserListBox, Path=SelectedItem}" />
-            </i:EventTrigger>-->
+            </i:EventTrigger>
         </i:Interaction.Triggers>
         <ListBox.ItemTemplate>
             <DataTemplate>
