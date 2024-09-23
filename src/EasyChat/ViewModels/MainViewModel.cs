@@ -146,6 +146,7 @@ public partial class MainViewModel : ObservableObject
                     MessageCount = 1
                 };
                 _allMessageCount++;
+                _eventHelper.StartBlink();
                 UserListVm.Users.Add(chatmodel);
             }
             UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;

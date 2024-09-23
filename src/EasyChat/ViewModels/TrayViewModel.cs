@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -25,7 +24,7 @@ public partial class TrayViewModel : ObservableObject
         evt.StopBlinkEvent += StopBlinking;
     }
 
-    [ObservableProperty] private ImageSource _trayIconSource;
+    [ObservableProperty] private ImageSource? _trayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
 
     public void StartBlinking(object? sender, EventArgs e)
     {
@@ -42,11 +41,11 @@ public partial class TrayViewModel : ObservableObject
     {
         if (_isIconVisible)
         {
-            TrayIconSource = null; // 隐藏图标
+            TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_null.ico")); ; // 隐藏图标
         }
         else
         {
-            TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico")); // 显示图标
+            TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_new.ico")); // 显示图标
         }
 
         _isIconVisible = !_isIconVisible;

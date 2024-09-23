@@ -14,13 +14,13 @@
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
-    <Grid MouseDown="Border_MouseDown">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="37" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0"  MouseDown="Border_MouseDown">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" >
                 <StackPanel Orientation="Horizontal">
                     <ui:Button 

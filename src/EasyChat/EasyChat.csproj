@@ -19,6 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Resources\favicon_new.ico" />
+      <None Remove="Resources\favicon_null.ico" />
       <None Remove="Resources\Images\p1.ico" />
       <None Remove="Resources\Images\p1.jpg" />
       <None Remove="Resources\Images\p10.jpg" />
@@ -61,6 +63,8 @@
 
     <ItemGroup>
         <Resource Include="Resources\favicon.ico" />
+        <Resource Include="Resources\favicon_new.ico" />
+        <Resource Include="Resources\favicon_null.ico" />
         <Resource Include="Resources\Images\p1.jpg" />
         <Resource Include="Resources\Images\p10.jpg" />
         <Resource Include="Resources\Images\p11.jpg" />
