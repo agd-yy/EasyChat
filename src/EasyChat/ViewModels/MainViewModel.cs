@@ -43,6 +43,7 @@ public partial class MainViewModel : ObservableObject
         UserListVm.OnSelected += UserSelect;
 
         _myClient.AddTopic(MqttContent.GROUP);
+        GC.Collect();
     }
 
     /// <summary>

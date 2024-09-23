@@ -16,17 +16,21 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="37" />
+            <RowDefinition Height="35" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" MouseDown="Border_MouseDown">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" >
+            <Border HorizontalAlignment="Stretch"  Background="Transparent" >
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  >
-                    <ui:Button Icon="{ui:SymbolIcon Symbol=Pin12}"
-                        Command="{Binding ToggleTopmostCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
-                        <ui:Button.Style>
-                            <Style TargetType="ui:Button">
+                    <ui:Button Command="{Binding ToggleTopmostCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Foreground" Value="CadetBlue" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Width" Value="30" />
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Pin12}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsTopmost}" Value="True">
@@ -34,16 +38,30 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </ui:Button.Style>
+                        </Button.Style>
                     </ui:Button>
 
-                    <ui:Button Icon="{ui:SymbolIcon Symbol=Subtract12}"
-                            Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+                    <ui:Button Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Foreground" Value="CadetBlue" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Width" Value="30" />
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Subtract12}" />
+                            </Style>
+                        </Button.Style>
+                    </ui:Button>
 
-                    <ui:Button 
-                        Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
-                        <ui:Button.Style>
-                            <Style TargetType="ui:Button">
+                    <ui:Button Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Foreground" Value="CadetBlue" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Width" Value="30" />
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Content" Value="{ui:SymbolIcon Symbol=FullScreenMaximize16}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsMaximized}" Value="True">
@@ -51,11 +69,22 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </ui:Button.Style>
+                        </Button.Style>
                     </ui:Button>
 
-                    <ui:Button Icon="{ui:SymbolIcon Symbol=Dismiss12}" 
-                            Command="{Binding HideCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+                    <ui:Button Command="{Binding HideCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Foreground" Value="CadetBlue" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Margin" Value="0 0 5 0" />
+                                <Setter Property="Width" Value="30" />
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Dismiss12}" />
+                            </Style>
+                        </Button.Style>
+                    </ui:Button>
                 </StackPanel>
             </Border>
         </Grid>
