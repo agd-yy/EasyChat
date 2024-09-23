@@ -12,6 +12,9 @@ public partial class TrayViewModel : ObservableObject
 {
     private DispatcherTimer _blinkTimer;
     private bool _isIconVisible = true;
+    private readonly ImageSource _favicon = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
+    private readonly ImageSource _favicon_new = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_new.ico"));
+    private readonly ImageSource _favicon_null = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_null.ico"));
 
     public TrayViewModel()
     {
@@ -24,28 +27,28 @@ public partial class TrayViewModel : ObservableObject
         evt.StopBlinkEvent += StopBlinking;
     }
 
-    [ObservableProperty] private ImageSource? _trayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
+    [ObservableProperty] private ImageSource _trayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
 
-    public void StartBlinking(object? sender, EventArgs e)
+    private void StartBlinking(object? sender, EventArgs e)
     {
         _blinkTimer.Start();
     }
 
-    public void StopBlinking(object? sender, EventArgs e)
+    private void StopBlinking(object? sender, EventArgs e)
     {
         _blinkTimer.Stop();
-        TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
+        TrayIconSource = _favicon;
     }
 
     private void ToggleIcon()
     {
         if (_isIconVisible)
         {
-            TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_null.ico")); ; // 隐藏图标
+            TrayIconSource = _favicon_null;
         }
         else
         {
-            TrayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_new.ico")); // 显示图标
+            TrayIconSource = _favicon_new;
         }
 
         _isIconVisible = !_isIconVisible;

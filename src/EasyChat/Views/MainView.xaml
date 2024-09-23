@@ -20,14 +20,42 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"  MouseDown="Border_MouseDown">
+        <Grid Grid.Row="0" MouseDown="Border_MouseDown">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" >
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  >
+                    <ui:Button Icon="{ui:SymbolIcon Symbol=Pin12}"
+                        Command="{Binding ToggleTopmostCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button">
+                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Pin12}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsTopmost}" Value="True">
+                                        <Setter Property="Content" Value="{ui:SymbolIcon Symbol=PinOff16}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+
+                    <ui:Button Icon="{ui:SymbolIcon Symbol=Subtract12}"
+                            Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+
                     <ui:Button 
-                            VerticalAlignment="Bottom" IsEnabled="{Binding CloseCommand, Converter={StaticResource StringToBooleanConverter}}"
-                                Icon="{ui:SymbolIcon Symbol=FullScreenMaximize16}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
-                    <ui:Button Icon="{ui:SymbolIcon Symbol=FullScreenMaximize16}"
-                            Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+                        Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button">
+                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=FullScreenMaximize16}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMaximized}" Value="True">
+                                        <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Crop16}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+
+                    <ui:Button Icon="{ui:SymbolIcon Symbol=Dismiss12}" 
+                            Command="{Binding HideCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
                 </StackPanel>
             </Border>
         </Grid>

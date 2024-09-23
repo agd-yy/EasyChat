@@ -29,9 +29,4 @@ public static class MqttContent
         Random _random = new Random();
         return "/Resources/Images/p" + _random.Next(1, 13) + ".jpg";
     }
-
-    // message/自己UID (别人发送给自己的消息)
-    // 界面优化；消息提醒（闪烁或者声音提醒）；聊天页面按用户分组；点击在线用户进入聊天界面
-
-
 }

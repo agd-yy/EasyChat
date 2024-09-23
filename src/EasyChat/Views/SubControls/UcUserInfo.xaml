@@ -48,25 +48,25 @@
                      x:Name="UsernameTextBox"
                      Padding="5"
                      FontSize="14" />
-            <TextBlock Margin="0,0,0,5"
+            <!--<TextBlock Margin="0,0,0,5"
                        Text="Password:"
                        Foreground="DarkSlateGray"
                        FontSize="14" FontWeight="Bold" />
             <PasswordBox Margin="0,0,0,10"
                          s:PasswordHelper.Attach="True"
                          s:PasswordHelper.Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Padding="5" FontSize="14" />
+                         Padding="5" FontSize="14" />-->
             <StackPanel Margin="0,10,0,10"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center">
                 <Button Margin="0,0,10,0"
                         Content="Server"
-                        Width="100"
+                        Width="100"  ToolTip="选择这个按钮同时成为服务器和客户端，但是只能存在一个服务器"
                         Command="{Binding ServerCommand}"
                         CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Style="{DynamicResource LoginBtnStyle}" />
                 <Button Content="Client"
-                        Width="100"
+                        Width="100" ToolTip="选择这个按钮成为客户端，需要服务器IP"
                         Command="{Binding ClientCommand}"
                         CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         Style="{DynamicResource LoginBtnStyle}" />

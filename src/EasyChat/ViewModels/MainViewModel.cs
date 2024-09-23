@@ -16,7 +16,8 @@ public partial class MainViewModel : ObservableObject
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private readonly LoginViewModel _loginViewModel = Singleton<LoginViewModel>.Instance;
     private EventHelper _eventHelper = EventHelper.Instance;
-    private int _allMessageCount = 0;
+    // 新消息总数
+    private int _allNewMessageCount = 0;
     // <uid , uid对应全部消息>
     private readonly Dictionary<string, List<ChatMessage>> _chatMessageDic = new Dictionary<string, List<ChatMessage>>();
 
@@ -83,8 +84,6 @@ public partial class MainViewModel : ObservableObject
     /// <param name="newMsg"></param>
     private void ClientChangeReceiveMsg(MsgModel newMsg)
     {
-        // 先取这个消息是谁的，加到对应的消息里，
-        // 更新最新一条消息，如果当前选中的对话框不是这个用户，则未读消息++
         ChatMessage chats = new ChatMessage
         {
             NickName = newMsg.userModel.nickName,
@@ -112,7 +111,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 处理群消息
+    /// 处理群消息 需要增加新建群聊的功能
     /// </summary>
     /// <param name="newMsg"></param>
     /// <param name="chats"></param>
@@ -127,7 +126,7 @@ public partial class MainViewModel : ObservableObject
                 if (newMsg.groupName != ChatObj.Uid)
                 {
                     UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
-                    _allMessageCount++;
+                    _allNewMessageCount++;
                     _eventHelper.StartBlink();
                 }
             }
@@ -145,7 +144,7 @@ public partial class MainViewModel : ObservableObject
                     TagName = "",
                     MessageCount = 1
                 };
-                _allMessageCount++;
+                _allNewMessageCount++;
                 _eventHelper.StartBlink();
                 UserListVm.Users.Add(chatmodel);
             }
@@ -166,7 +165,7 @@ public partial class MainViewModel : ObservableObject
             if (newMsg.userModel.uid != ChatObj.Uid)
             {
                 UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().MessageCount++;
-                _allMessageCount++;
+                _allNewMessageCount++;
                 _eventHelper.StartBlink();
             }
         }
@@ -186,8 +185,8 @@ public partial class MainViewModel : ObservableObject
         try
         {
             SendTopic = chatModel.Uid;
-            _allMessageCount -= chatModel.MessageCount;
-            if(_allMessageCount == 0)
+            _allNewMessageCount -= chatModel.MessageCount;
+            if(_allNewMessageCount == 0)
             {
                 _eventHelper.StopBlink();
             }
@@ -208,6 +207,41 @@ public partial class MainViewModel : ObservableObject
     }
 
     #region Commands
+
+    [RelayCommand]
+    private void Minimize(Window window)
+    {
+        window.WindowState = WindowState.Minimized;
+    }
+
+    [RelayCommand]
+    private void Maximize(Window window)
+    {
+        if (window.WindowState == WindowState.Maximized)
+        {
+            window.WindowState = WindowState.Normal;
+            IsMaximized = false;
+        }
+        else
+        {
+            window.WindowState = WindowState.Maximized;
+            IsMaximized = true;
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleTopmost(Window window)
+    {
+        window.Topmost = !window.Topmost;
+        IsTopmost = window.Topmost;
+    }
+
+    [RelayCommand]
+    private void Hide(Window window)
+    {
+        window.Hide();
+    }
+
     [RelayCommand]
     private void Send()
     {
@@ -273,6 +307,11 @@ public partial class MainViewModel : ObservableObject
     #endregion
 
     #region Property
+    [ObservableProperty]
+    private bool _isMaximized;
+
+    [ObservableProperty]
+    private bool _isTopmost;
 
     // 左侧用户
     public UserListVm UserListVm { get; } = new();
@@ -291,7 +330,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _sendTopic = string.Empty;
 
     /// <summary>
-    ///     用户
+    ///     用户自己
     /// </summary>
     [ObservableProperty] private ChatModel _myChatModel = new ChatModel();
     /// <summary>

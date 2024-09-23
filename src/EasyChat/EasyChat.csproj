@@ -50,8 +50,6 @@
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Dragablz" />
-        <PackageReference Include="MahApps.Metro.IconPacks.Core" />
-        <PackageReference Include="MahApps.Metro.IconPacks.Material" />
         <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
         <PackageReference Include="MQTTnet" />
         <PackageReference Include="Newtonsoft.Json" />
