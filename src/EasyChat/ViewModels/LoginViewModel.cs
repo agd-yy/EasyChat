@@ -5,6 +5,7 @@ using System.Windows.Media.Media3D;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EasyChat.Controls;
+using EasyChat.Models;
 using EasyChat.Service;
 using EasyChat.Utilities;
 
@@ -64,6 +65,9 @@ public partial class LoginViewModel : ObservableObject
             return;
         }
         MqttService.CreateMqttService();
+        MqttContent.IPADDRESS = IpAddr;
+        MqttContent.USER_NAME = UserName;
+        MqttContent.PASSWORD = Password;
         window.DialogResult = true;
     }
 

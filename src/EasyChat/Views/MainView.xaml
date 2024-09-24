@@ -82,6 +82,21 @@
                                 <Setter Property="Height" Value="30" />
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Dismiss12}" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" 
+                                                BorderBrush="{TemplateBinding BorderBrush}"  BorderThickness="{TemplateBinding BorderThickness}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="PaleVioletRed" />
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </Button.Style>
                     </ui:Button>
@@ -108,7 +123,7 @@
                         </Ellipse.Fill>
                     </Ellipse>
                     <Border.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding NothingCommand}" />
+                        <MouseBinding Gesture="LeftClick" Command="{Binding ImageClickCommand}" />
                     </Border.InputBindings>
                 </Border>
             </StackPanel>

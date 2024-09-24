@@ -34,4 +34,18 @@ public class MsgModel
     /// 所有在线用户，仅服务端需要
     /// </summary>
     public List<UserModel> userModels { get; set; } = [];
+
+    /// <summary>
+    /// 文件或者图片消息
+    /// </summary>
+    public bool isImageOrFile { get; set; }
+    
+    /// <summary>
+    /// 大文件分片传输：片总数
+    /// </summary>
+    public int totalChunks { get; set; } = 1;
+    /// <summary>
+    /// 大文件分片传输：当前片
+    /// </summary>
+    public int thisChunk { get; set; }
 }

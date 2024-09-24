@@ -23,6 +23,10 @@ public static class MqttContent
     public const string SERVER_PW = "233";
     public const string OFFLINE_STRING = "(已离线)";
 
+    public static string IPADDRESS = string.Empty;
+    public static string PASSWORD = string.Empty;
+    public static string USER_NAME = string.Empty;
+
     // 生成随机头像用
     public static string GetRandomImg()
     {

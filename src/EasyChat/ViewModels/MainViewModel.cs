@@ -6,16 +6,16 @@ using EasyChat.Controls;
 using EasyChat.Handle;
 using EasyChat.Models;
 using EasyChat.Service;
-using EasyChat.Utilities;
 using EasyChat.ViewModels.SubVms;
+using System.IO;
 
 namespace EasyChat.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
-    private readonly LoginViewModel _loginViewModel = Singleton<LoginViewModel>.Instance;
     private EventHelper _eventHelper = EventHelper.Instance;
+    private string _sendTopic = string.Empty;
     // 新消息总数
     private int _allNewMessageCount = 0;
     // <uid , uid对应全部消息>
@@ -24,7 +24,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel()
     {
         // 客户端名绑定界面
-        var nickName = string.IsNullOrEmpty(_loginViewModel.UserName) ? _myClient.MyClientUid : _loginViewModel.UserName;
+        var nickName = string.IsNullOrEmpty(MqttContent.USER_NAME) ? _myClient.MyClientUid : MqttContent.USER_NAME;
         MyChatModel = new ChatModel
         {
             Uid = _myClient.MyClientUid,
@@ -36,11 +36,12 @@ public partial class MainViewModel : ObservableObject
         };
         UserListVm.Users.Add(MyChatModel);
         //启动客户端
-        _myClient.StartClient(_loginViewModel.IpAddr, MyChatModel);
+        _myClient.StartClient(MqttContent.IPADDRESS, MyChatModel);
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
         // 用户选择回调
         UserListVm.OnSelected += UserSelect;
+        UserListVm.RightClicked += Nothing;
 
         _myClient.AddTopic(MqttContent.GROUP);
         GC.Collect();
@@ -177,6 +178,49 @@ public partial class MainViewModel : ObservableObject
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
     }
 
+    private void DealReceiveImageOrFile(MsgModel newMsg)
+    {
+        string base64String = newMsg.message;
+
+        // 1. 将 Base64 字符串转换为二进制文件
+        byte[] fileBytes = Convert.FromBase64String(base64String);
+
+    }
+
+    private void DealSendImageOrFile(string topic, bool isGroupMsg)
+    {
+        byte[] fileBytes = File.ReadAllBytes("path/to/file");
+        int chunkSize = 1024 * 1024; // 每个分片的大小 (1 MB)
+        int totalChunks = (fileBytes.Length + chunkSize - 1) / chunkSize;
+        if (totalChunks > 100)
+        {
+            return;
+        }
+        for (int i = 0; i < totalChunks; i++)
+        {
+            int offset = i * chunkSize;
+            int length = Math.Min(chunkSize, fileBytes.Length - offset);
+            byte[] chunk = new byte[length];
+            Array.Copy(fileBytes, offset, chunk, 0, length);
+            var msgModel = new MsgModel
+            {
+                userModel = new UserModel()
+                {
+                    uid = MyChatModel.Uid,
+                    nickName = MyChatModel.NickName,
+                    image = MyChatModel.Image
+                },
+                sendTime = DateTime.Now,
+                message = Convert.ToBase64String(chunk),
+                isGroupMsg = isGroupMsg,
+                isImageOrFile = true,
+                thisChunk = i,
+                totalChunks = totalChunks
+            };
+            _myClient.SendMsg(topic, msgModel);
+        }
+    }
+
     private void UserSelect(ChatModel chatModel)
     {
         if (chatModel == null)
@@ -185,7 +229,7 @@ public partial class MainViewModel : ObservableObject
         }
         try
         {
-            SendTopic = chatModel.Uid;
+            _sendTopic = chatModel.Uid;
             _allNewMessageCount -= chatModel.MessageCount;
             if(_allNewMessageCount == 0)
             {
@@ -213,6 +257,7 @@ public partial class MainViewModel : ObservableObject
     private void Minimize(Window window)
     {
         window.WindowState = WindowState.Minimized;
+        GC.Collect();
     }
 
     [RelayCommand]
@@ -222,6 +267,7 @@ public partial class MainViewModel : ObservableObject
         {
             window.WindowState = WindowState.Normal;
             IsMaximized = false;
+            GC.Collect();
         }
         else
         {
@@ -253,7 +299,7 @@ public partial class MainViewModel : ObservableObject
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
-                    var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + SendTopic;
+                    var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + _sendTopic;
                     var msgModel = new MsgModel
                     {
                         userModel = new UserModel()
@@ -267,11 +313,11 @@ public partial class MainViewModel : ObservableObject
                         isGroupMsg = isGroupMsg
                     };
                     _myClient.SendMsg(topic, msgModel);
-                    if (!isGroupMsg && !MyChatModel.Uid.Equals(SendTopic))
+                    if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
                     {
-                        if (_chatMessageDic.ContainsKey(SendTopic))
+                        if (_chatMessageDic.ContainsKey(_sendTopic))
                         {
-                            _chatMessageDic[SendTopic].Add(new ChatMessage
+                            _chatMessageDic[_sendTopic].Add(new ChatMessage
                             {
                                 NickName = MyChatModel.NickName,
                                 Image = MyChatModel.Image,
@@ -279,9 +325,9 @@ public partial class MainViewModel : ObservableObject
                                 Time = msgModel.sendTime.ToString(),
                                 IsMyMessage = true
                             });
-                            UserListVm.Users.Where(x => x.Uid == SendTopic).First().MessageCount = 0;
-                            UserListVm.Users.Where(x => x.Uid == SendTopic).First().Message = msgModel.message;
-                            ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[SendTopic]);
+                            UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
+                            UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
+                            ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
                         }
                     }
                     SendMsg = "";
@@ -305,6 +351,13 @@ public partial class MainViewModel : ObservableObject
     {
         EcMsgBox.Show("这个功能还没做");
     }
+
+    [RelayCommand]
+    private void ImageClick()
+    {
+        MyChatModel.Image = MqttContent.GetRandomImg();
+    }
+    
     #endregion
 
     #region Property
@@ -324,11 +377,6 @@ public partial class MainViewModel : ObservableObject
     ///     发送信息
     /// </summary>
     [ObservableProperty] private string _sendMsg = string.Empty;
-
-    /// <summary>
-    ///     发送主题
-    /// </summary>
-    [ObservableProperty] private string _sendTopic = string.Empty;
 
     /// <summary>
     ///     用户自己
