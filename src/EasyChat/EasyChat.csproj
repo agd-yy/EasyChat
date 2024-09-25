@@ -44,6 +44,7 @@
       <Page Remove="Controls\MyMessageChat.xaml" />
       <Page Remove="Controls\UserChat.xaml" />
       <Page Remove="Controls\UserImage.xaml" />
+      <Page Remove="Styles\ChatStyle.xaml" />
       <Page Remove="Views\ChatView.xaml" />
     </ItemGroup>
 

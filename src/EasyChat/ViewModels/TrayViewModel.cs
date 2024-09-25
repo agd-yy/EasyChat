@@ -29,12 +29,12 @@ public partial class TrayViewModel : ObservableObject
 
     [ObservableProperty] private ImageSource _trayIconSource = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
 
-    private void StartBlinking(object? sender, EventArgs e)
+    private void StartBlinking()
     {
         _blinkTimer.Start();
     }
 
-    private void StopBlinking(object? sender, EventArgs e)
+    private void StopBlinking()
     {
         _blinkTimer.Stop();
         TrayIconSource = _favicon;

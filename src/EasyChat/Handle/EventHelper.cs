@@ -4,17 +4,23 @@ namespace EasyChat.Handle
 {
     public class EventHelper : Singleton<EventHelper>
     {
-        public event EventHandler? StartBlinkEvent;
-        public event EventHandler? StopBlinkEvent;
+        public event Action? StartBlinkEvent;
+        public event Action? StopBlinkEvent;
+        public event Action? ClearNewMessage;
 
         public void StartBlink()
         {
-            StartBlinkEvent?.Invoke(this, EventArgs.Empty);
+            StartBlinkEvent?.Invoke();
         }
 
         public void StopBlink()
         {
-            StopBlinkEvent?.Invoke(this, EventArgs.Empty);
+            StopBlinkEvent?.Invoke();
+        }
+
+        public void ClearNewMessageCount()
+        {
+            ClearNewMessage?.Invoke();
         }
     }
 }

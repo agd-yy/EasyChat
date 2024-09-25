@@ -8,6 +8,8 @@ using EasyChat.Models;
 using EasyChat.Service;
 using EasyChat.ViewModels.SubVms;
 using System.IO;
+using Wpf.Ui.Appearance;
+using Wpf.Ui;
 
 namespace EasyChat.ViewModels;
 
@@ -16,6 +18,7 @@ public partial class MainViewModel : ObservableObject
     private readonly MyMqttClient _myClient = MyMqttClient.Instance;
     private EventHelper _eventHelper = EventHelper.Instance;
     private string _sendTopic = string.Empty;
+    ThemeService _themeService = new ThemeService();
     // 新消息总数
     private int _allNewMessageCount = 0;
     // <uid , uid对应全部消息>
@@ -352,10 +355,20 @@ public partial class MainViewModel : ObservableObject
         EcMsgBox.Show("这个功能还没做");
     }
 
+    private bool isTheme;
     [RelayCommand]
     private void ImageClick()
     {
         MyChatModel.Image = MqttContent.GetRandomImg();
+        isTheme = !isTheme;
+        if (isTheme)
+        {
+            _themeService.SetTheme(ApplicationTheme.Light);
+        }
+        else
+        {
+            _themeService.SetTheme(ApplicationTheme.Dark);
+        }
     }
     
     #endregion

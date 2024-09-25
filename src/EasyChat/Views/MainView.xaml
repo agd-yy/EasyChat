@@ -14,107 +14,109 @@
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <SolidColorBrush x:Key="Control.BoderBrush" Color="#CBCBCB"/>
+        <Style x:Key="SearchTestBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="#FFF2F3F4"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Control.BoderBrush}"/>
+            <Setter Property="Foreground" Value="#515151"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="8 0 0 0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border" CornerRadius="8" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="44"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="bdLeft" CornerRadius="8" Margin="4 4 8 4">
+                                    <Grid>
+                                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                        <TextBlock Text="搜索" VerticalAlignment="Center" Margin="10 0" Opacity="0.8">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TextBox},Path=Text}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                                <ui:Button Grid.Column="1" Margin="4" Command="{Binding NothingCommand}"  >
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                            <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Search12}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="bd" CornerRadius="8" Background="Transparent">
+                                                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="bd" Property="Background" Value="#60CACACA"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </ui:Button>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="white"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="Background" TargetName="bdLeft" Value="#60CACACA"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="Transparent"/>
+                                <Setter Property="Background" TargetName="border" Value="white"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                        <Condition Property="IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="35" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60" />
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" MinWidth="300"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" MouseDown="Border_MouseDown">
-            <Border HorizontalAlignment="Stretch"  Background="Transparent" >
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  >
-                    <ui:Button Command="{Binding ToggleTopmostCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Foreground" Value="CadetBlue" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Width" Value="30" />
-                                <Setter Property="Height" Value="30" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Pin12}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsTopmost}" Value="True">
-                                        <Setter Property="Content" Value="{ui:SymbolIcon Symbol=PinOff16}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </ui:Button>
-
-                    <ui:Button Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Foreground" Value="CadetBlue" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Width" Value="30" />
-                                <Setter Property="Height" Value="30" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Subtract12}" />
-                            </Style>
-                        </Button.Style>
-                    </ui:Button>
-
-                    <ui:Button Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Foreground" Value="CadetBlue" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Width" Value="30" />
-                                <Setter Property="Height" Value="30" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=FullScreenMaximize16}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMaximized}" Value="True">
-                                        <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Crop16}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </ui:Button>
-
-                    <ui:Button Command="{Binding HideCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Foreground" Value="CadetBlue" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Margin" Value="0 0 5 0" />
-                                <Setter Property="Width" Value="30" />
-                                <Setter Property="Height" Value="30" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Dismiss12}" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" 
-                                                BorderBrush="{TemplateBinding BorderBrush}"  BorderThickness="{TemplateBinding BorderThickness}">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="PaleVioletRed" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </ui:Button>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60" />
-                <ColumnDefinition Width="*" MinWidth="200"/>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="2*" MinWidth="300"/>
-            </Grid.ColumnDefinitions>
-
-            <!--#region // 头像功能 //-->
+        <!--#region // 头像功能 //-->
+        <Grid Grid.Column="0" >
             <StackPanel Background="#2e2e2e" >
-                <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 2"  Grid.Column="0"
+                <Border BorderBrush="White" BorderThickness="2" CornerRadius="50" Margin="0 30 0 0" 
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"  ToolTip="{Binding MyChatModel.NickName}" >
                     <Ellipse Width="50" Height="50">
@@ -127,43 +129,127 @@
                     </Border.InputBindings>
                 </Border>
             </StackPanel>
+        </Grid>
+        <!--#endregion-->
+        
+        <!--#region// 聊天列表&搜索框 //-->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  搜索框 -->
+            <Grid Grid.Row="0" >
+                <TextBox Style="{DynamicResource SearchTestBox}"/>
+            </Grid>
+            <subView:UserListUc Grid.Row="1" DataContext="{Binding UserListVm}" />
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region// 分割线 //-->
+        <GridSplitter Grid.Column="2" Width="2" VerticalAlignment="Stretch" />
+        <!--#endregion-->
+
+        <!--#region //聊天内容主体窗口 //-->
+        <Grid Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="2.5*" />
+                <RowDefinition Height="1" />
+                <RowDefinition Height="*" MinHeight="50" MaxHeight="200" />
+                <RowDefinition Height="60" />
+            </Grid.RowDefinitions>
+
+            <!--#region// 顶部图标功能 //-->
+            <Grid Grid.Row="0" MouseDown="Border_MouseDown">
+                <Border HorizontalAlignment="Stretch"  Background="Transparent" >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"  >
+                        <ui:Button Command="{Binding ToggleTopmostCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                    <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Pin12}" />
+                                    <Setter Property="ToolTip" Value="置顶"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsTopmost}" Value="True">
+                                            <Setter Property="ToolTip" Value="取消置顶"/>
+                                            <Setter Property="Content" Value="{ui:SymbolIcon Symbol=PinOff16}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </ui:Button>
+
+                        <ui:Button Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                    <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Subtract12}" />
+                                    <Setter Property="ToolTip" Value="最小化"/>
+                                </Style>
+                            </Button.Style>
+                        </ui:Button>
+
+                        <ui:Button Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                    <Setter Property="ToolTip" Value="最大化"/>
+                                    <Setter Property="Content" Value="{ui:SymbolIcon Symbol=FullScreenMaximize16}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMaximized}" Value="True">
+                                            <Setter Property="ToolTip" Value="向下还原"/>
+                                            <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Crop16}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </ui:Button>
+
+                        <ui:Button Command="{Binding HideCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" >
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                    <Setter Property="Margin" Value="0 0 5 0" />
+                                    <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Dismiss12}" />
+                                    <Setter Property="ToolTip" Value="关闭"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="bd" CornerRadius="8" Background="Transparent">
+                                                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Background" Value="#fb7373"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </ui:Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
             <!--#endregion-->
 
-            <!--#region// 聊天列表 //-->
-            <subView:UserListUc Grid.Column="1" DataContext="{Binding UserListVm}" />
-            <!--#endregion-->
+            <ui:Card Grid.Row="1">
+                <TextBlock Text="{Binding ChatObj.NickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </ui:Card>
 
-            <!--#region// 分割线 //-->
-            <GridSplitter Grid.Column="2" Width="1" VerticalAlignment="Stretch" />
-            <!--#endregion-->
+            <!-- Chat messages list -->
+            <subView:MessageUc Grid.Row="2" DataContext="{Binding ChatMessages}" />
 
-            <Grid Grid.Column="3">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50" />
-                    <RowDefinition Height="2.5*" />
-                    <RowDefinition Height="1" />
-                    <RowDefinition Height="*" MinHeight="50" MaxHeight="200" />
-                    <RowDefinition Height="60" />
-                </Grid.RowDefinitions>
-
-                <ui:Card Grid.Row="0">
-                    <TextBlock Text="{Binding ChatObj.NickName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </ui:Card>
-
-                <!-- Chat messages list -->
-                <subView:MessageUc Grid.Row="1" DataContext="{Binding ChatMessages}" />
-
-                <!--</TextBlock>-->
-                <GridSplitter Grid.Row="2" Height="1" HorizontalAlignment="Stretch" />
-                <ui:TextBox Grid.Row="3"
+            <!--</TextBlock>-->
+            <GridSplitter Grid.Row="3" Height="1" HorizontalAlignment="Stretch" />
+            <ui:TextBox Grid.Row="4"
                             TextWrapping="Wrap"
                             AcceptsReturn="True"
                             Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="0,0,0,60" Grid.RowSpan="2">
-                    <ui:TextBox.InputBindings>
-                        <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
-                    </ui:TextBox.InputBindings>
-                </ui:TextBox>
-                <ui:Button Grid.Row="4"
+                <ui:TextBox.InputBindings>
+                    <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
+                </ui:TextBox.InputBindings>
+            </ui:TextBox>
+            <ui:Button Grid.Row="5"
                            Margin="0,0,5,5"
                            FontSize="24"
                            HorizontalAlignment="Right"
@@ -172,8 +258,9 @@
                            Icon="{ui:SymbolIcon Symbol=Send24}"
                            Command="{Binding SendCommand}"
                            Content="发送" Grid.Column="1" />
-            </Grid>
         </Grid>
+        <!--#endregion-->
+        
         <!--#region // 托盘程序 //-->
         <view:TrayView />
         <!--#endregion-->

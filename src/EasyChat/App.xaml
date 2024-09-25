@@ -9,7 +9,6 @@
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="pack://application:,,,/Styles/ButtonStyle.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Styles/ChatStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Styles/Converts.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

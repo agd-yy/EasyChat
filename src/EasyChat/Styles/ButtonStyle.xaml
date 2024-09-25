@@ -7,4 +7,39 @@
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontWeight" Value="Bold" />
     </Style>
+
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Foreground" Value="CadetBlue" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="bd" CornerRadius="8" Background="Transparent">
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bd" Property="Background" Value="lightblue"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ToolTip">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border CornerRadius="2" BorderBrush="#525457" BorderThickness="1" Background="LightBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 0 2 2">
+                        <TextBlock  Text="{TemplateBinding ContentControl.Content}" Foreground="#fafbfd" FontFamily="Microsoft YaHei" FontSize="12" LineHeight="auto" Margin="6" TextWrapping="Wrap" MaxWidth="250"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>
