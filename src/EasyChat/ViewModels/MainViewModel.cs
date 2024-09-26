@@ -45,6 +45,7 @@ public partial class MainViewModel : ObservableObject
         // 用户选择回调
         UserListVm.OnSelected += UserSelect;
         UserListVm.RightClicked += Nothing;
+        _eventHelper.ClearNewMessage += ClearNewMessage;
 
         _myClient.AddTopic(MqttContent.GROUP);
         GC.Collect();
@@ -179,6 +180,23 @@ public partial class MainViewModel : ObservableObject
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
+    }
+
+    
+    /// <summary>
+    /// 清空未读消息
+    /// </summary>
+    private void ClearNewMessage()
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            foreach (var item in UserListVm.Users)
+            {
+                item.MessageCount = 0;
+            }
+            _allNewMessageCount = 0;
+            _eventHelper.StopBlink();
+        });
     }
 
     private void DealReceiveImageOrFile(MsgModel newMsg)

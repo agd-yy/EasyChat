@@ -27,6 +27,12 @@
         </i:Interaction.Triggers>
         <tray:NotifyIcon.Menu>
             <ContextMenu>
+                <MenuItem Header="一键已读"
+                    Command="{Binding Source={StaticResource Vm}, Path=Data.ClearNewMessageCommand}" >
+                    <MenuItem.Icon>
+                        <ui:SymbolIcon Symbol="Delete12" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="Show"
                           Command="{Binding Source={StaticResource Vm}, Path=Data.OpenCommand}"
                           CommandParameter="{Binding Source={StaticResource View}, Path=Data}">

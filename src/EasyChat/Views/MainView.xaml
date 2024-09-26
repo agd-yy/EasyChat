@@ -18,16 +18,16 @@
         <SolidColorBrush x:Key="Control.BoderBrush" Color="#CBCBCB"/>
         <Style x:Key="SearchTestBox" TargetType="{x:Type TextBox}">
             <Setter Property="Background" Value="#FFF2F3F4"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="#FFF2F3F4"/>
             <Setter Property="BorderBrush" Value="{StaticResource Control.BoderBrush}"/>
             <Setter Property="Foreground" Value="#515151"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="8 0 0 0"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="AllowDrop" Value="true"/>
             <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
-            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TextBox}">
@@ -54,7 +54,7 @@
                                         </TextBlock>
                                     </Grid>
                                 </Border>
-                                <ui:Button Grid.Column="1" Margin="4" Command="{Binding NothingCommand}"  >
+                                <ui:Button Grid.Column="1"  Command="{Binding NothingCommand}"  >
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
                                             <Setter Property="Content" Value="{ui:SymbolIcon Symbol=Search12}" />
@@ -156,9 +156,8 @@
                 <RowDefinition Height="35" />
                 <RowDefinition Height="50" />
                 <RowDefinition Height="2.5*" />
-                <RowDefinition Height="1" />
+                <RowDefinition Height="2" />
                 <RowDefinition Height="*" MinHeight="50" MaxHeight="200" />
-                <RowDefinition Height="60" />
             </Grid.RowDefinitions>
 
             <!--#region// 顶部图标功能 //-->
@@ -238,26 +237,37 @@
 
             <!-- Chat messages list -->
             <subView:MessageUc Grid.Row="2" DataContext="{Binding ChatMessages}" />
-
-            <!--</TextBlock>-->
-            <GridSplitter Grid.Row="3" Height="1" HorizontalAlignment="Stretch" />
-            <ui:TextBox Grid.Row="4"
-                            TextWrapping="Wrap"
-                            AcceptsReturn="True"
-                            Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="0,0,0,60" Grid.RowSpan="2">
-                <ui:TextBox.InputBindings>
-                    <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
-                </ui:TextBox.InputBindings>
-            </ui:TextBox>
-            <ui:Button Grid.Row="5"
-                           Margin="0,0,5,5"
-                           FontSize="24"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Bottom"
-                           IsEnabled="{Binding SendMsg, Converter={StaticResource StringToBooleanConverter}}"
-                           Icon="{ui:SymbolIcon Symbol=Send24}"
-                           Command="{Binding SendCommand}"
-                           Content="发送" Grid.Column="1" />
+            
+            <GridSplitter Grid.Row="3" Height="2" VerticalAlignment="Stretch" />
+            
+            <!-- send message -->
+            <Border x:Name="bdLeft" CornerRadius="8" Margin="4 4 8 4"  Grid.Row="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ui:TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                         TextWrapping="Wrap" AcceptsReturn="True"
+                         Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <ui:TextBox.InputBindings>
+                            <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
+                        </ui:TextBox.InputBindings>
+                    </ui:TextBox>
+                    <ui:Button Grid.Column="1" Grid.Row="1"
+                            FontSize="24"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding SendMsg, Converter={StaticResource StringToBooleanConverter}}"
+                            Icon="{ui:SymbolIcon Symbol=Send24}"
+                            Command="{Binding SendCommand}"
+                            Content="发送" />
+                </Grid>
+            </Border>
         </Grid>
         <!--#endregion-->
         

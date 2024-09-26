@@ -11,6 +11,7 @@ namespace EasyChat.ViewModels;
 public partial class TrayViewModel : ObservableObject
 {
     private DispatcherTimer _blinkTimer;
+    private EventHelper evt =  EventHelper.Instance;
     private bool _isIconVisible = true;
     private readonly ImageSource _favicon = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon.ico"));
     private readonly ImageSource _favicon_new = new BitmapImage(new Uri("pack://application:,,,/Resources/favicon_new.ico"));
@@ -22,7 +23,6 @@ public partial class TrayViewModel : ObservableObject
         _blinkTimer = new DispatcherTimer();
         _blinkTimer.Interval = TimeSpan.FromMilliseconds(500); // 每500ms切换一次
         _blinkTimer.Tick += (sender, e) => ToggleIcon();
-        EventHelper evt =  EventHelper.Instance;
         evt.StartBlinkEvent += StartBlinking;
         evt.StopBlinkEvent += StopBlinking;
     }
@@ -66,7 +66,11 @@ public partial class TrayViewModel : ObservableObject
     {
         window.Hide();
     }
-
+    [RelayCommand]
+    private void ClearNewMessage()
+    {
+        evt.ClearNewMessageCount();
+    }
     [RelayCommand]
     private void Exit()
     {
