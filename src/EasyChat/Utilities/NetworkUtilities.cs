@@ -5,7 +5,7 @@ namespace EasyChat.Utilities;
 
 public class NetworkUtilities
 {
-    private static readonly string[] AllHost = ["0.0.0.0"];
+    private static readonly string[] AllHost = ["127.0.0.1"];
 
     public static IList<string> GetIps()
     {

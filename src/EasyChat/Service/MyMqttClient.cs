@@ -8,6 +8,7 @@ using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
+using static System.Windows.Forms.Design.AxImporter;
 
 namespace EasyChat.Service;
 
@@ -45,26 +46,6 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             .WithClientId(JsonExtension.Serialize(user))
             .WithCredentials(MqttContent.SERVER_USER, MqttContent.SERVER_PW) // 设置用户名密码
             .Build();
-
-        try
-        {
-            // 连接到MQTT服务器
-            await MqttClient.ConnectAsync(options);
-            if (MqttClient.IsConnected)
-            {
-                ReceiveMsgEvent?.Invoke(new MsgModel { 
-                    userModel = new UserModel { uid = MyClientUid },
-                    message = "连接服务器成功", sendTime = DateTime.Now});
-            }
-        }
-        catch
-        {
-            ReceiveMsgEvent?.Invoke(new MsgModel {
-                userModel = new UserModel { uid = MyClientUid },message = "连接服务器失败", sendTime = DateTime.Now});
-        }
-
-        // 订阅主题
-        InitSubTopic();
         MqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(HandleMSG);
         // 重连机制
         MqttClient.UseDisconnectedHandler(async e =>
@@ -83,6 +64,31 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
                 ReceiveMsgEvent?.Invoke(new MsgModel { userModel = new UserModel { uid = MyClientUid },message = "重连服务器失败", sendTime = DateTime.Now});
             }
         });
+        try
+        {
+            // 连接到MQTT服务器
+            await MqttClient.ConnectAsync(options);
+            if (MqttClient.IsConnected)
+            {
+                // 订阅主题
+                InitSubTopic();
+                ReceiveMsgEvent?.Invoke(new MsgModel
+                {
+                    userModel = new UserModel { uid = MyClientUid },
+                    message = "连接服务器成功",
+                    sendTime = DateTime.Now
+                });
+            }
+        }
+        catch
+        {
+            ReceiveMsgEvent?.Invoke(new MsgModel
+            {
+                userModel = new UserModel { uid = MyClientUid },
+                message = "连接服务器失败",
+                sendTime = DateTime.Now
+            });
+        }
     }
 
     /// <summary>

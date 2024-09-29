@@ -64,7 +64,10 @@ public partial class LoginViewModel : ObservableObject
             EcMsgBox.Show("请输入有效的IP地址");
             return;
         }
-        MqttService.CreateMqttService();
+        if (IsServer)
+        {
+            MqttService.CreateMqttService();
+        }
         MqttContent.IPADDRESS = IpAddr;
         MqttContent.USER_NAME = UserName;
         MqttContent.PASSWORD = Password;

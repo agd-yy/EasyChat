@@ -154,7 +154,12 @@ public class MqttService
         {
             return;
         }    
-        onlineClientUids.Add(userModel);
+        userModel.isOnline = true;
+        if (!onlineClientUids.Any(o => o.uid == userModel.uid))
+        {
+            onlineClientUids.Add(userModel);
+        }
+        onlineClientUids.RemoveAll(o => o.isOnline == false);
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
             userModels = onlineClientUids,

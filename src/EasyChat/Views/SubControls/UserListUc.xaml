@@ -58,8 +58,8 @@
                             </StackPanel>
                         </Border>
                         <Border Grid.Column="1" Grid.Row="1">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="{Binding Message}" VerticalAlignment="Center" FontSize="12" Foreground="Gray"/>
+                            <StackPanel Orientation="Vertical" MaxWidth ="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}, Converter={StaticResource WidthPercentageConverter}, ConverterParameter=1}">
+                                <TextBlock Text="{Binding Message}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="12" Foreground="Gray"/>
                             </StackPanel>
                         </Border>
 

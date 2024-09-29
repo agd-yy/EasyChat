@@ -45,7 +45,6 @@
             <Setter Property="CornerRadius" Value="25"/>
             <Setter Property="Width" Value="50"/>
             <Setter Property="Height" Value="50"/>
-            <Setter Property="Margin" Value="5"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -86,34 +85,37 @@
                         <RowDefinition  Height="Auto"/>
                     </Grid.RowDefinitions>
                     <!-- 左边头像 -->
-                    <Border Grid.Column="0" Style="{StaticResource LeftAvatarStyle}">
-                        <Ellipse Width="50" Height="50">
+                    <Border Grid.Column="0" Style="{StaticResource LeftAvatarStyle}" Margin="0 -20 0 0">
+                        <Ellipse Width="40" Height="40">
                             <Ellipse.Fill>
                                 <ImageBrush ImageSource="{Binding Image}" />
                             </Ellipse.Fill>
                         </Ellipse>
                     </Border>
-                    <!-- 消息气泡 -->
-                    <Border Grid.Column="1" Style="{StaticResource MessageBubbleStyle}">
-                        <StackPanel Orientation="Vertical">
-                            <!-- 昵称 -->
-                            <TextBlock Text="{Binding NickName}" FontWeight="Bold" Foreground="Pink" Margin="0,0,0,5">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding NickName}" Value="">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                    <StackPanel Orientation="Vertical"  Grid.Column="1">
+                        <TextBlock Text="{Binding NickName}" FontWeight="Bold" FontSize="12" Foreground="Pink" Margin="10 0 0 0" HorizontalAlignment="Left">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NickName}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <!-- 消息气泡 -->
+                        <Border Style="{StaticResource MessageBubbleStyle}" MaxWidth ="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel}, Converter={StaticResource WidthPercentageConverter}, ConverterParameter=0.6}">
+                            <StackPanel Orientation="Vertical">
 
                             <!-- 消息文本 -->
                             <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Style.Triggers>
+                                            <Style.Triggers>
                                             <DataTrigger Binding="{Binding Message}" Value="">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
@@ -122,7 +124,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
 
-                            <!-- 时间 -->
+                            <!-- 时间  -->
                             <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -136,10 +138,11 @@
                             </TextBlock>
                         </StackPanel>
                     </Border>
+                    </StackPanel>
 
                     <!-- 右边头像 -->
                     <Border Grid.Column="2" Style="{StaticResource RightAvatarStyle}">
-                        <Ellipse Width="50" Height="50">
+                        <Ellipse Width="40" Height="40">
                             <Ellipse.Fill>
                                 <ImageBrush ImageSource="{Binding Image}" />
                             </Ellipse.Fill>

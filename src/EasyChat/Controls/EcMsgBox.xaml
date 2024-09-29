@@ -9,7 +9,7 @@
             <StackPanel>
                 <TextBlock x:Name="MessageTextBlock" TextWrapping="Wrap" FontSize="16" Foreground="Pink"
                            TextAlignment="Center" />
-                <Button Content="好(*╹▽╹*)~" Width="80" Height="30" HorizontalAlignment="Center" Margin="10,10,0,0"
+                <Button Content="好(*╹▽╹*)~" Width="95" Height="30" HorizontalAlignment="Center" Margin="10,10,0,0"
                         Background="Pink" Foreground="White" Click="OkButton_Click" />
             </StackPanel>
         </Border>

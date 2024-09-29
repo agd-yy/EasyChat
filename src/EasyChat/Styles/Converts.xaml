@@ -6,4 +6,5 @@
     <converter:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     <converter:StringToBooleanConverter x:Key="StringToBooleanConverter"/>
     <converter:UIntToVisibilityConverter x:Key="UIntToVisibilityConverter"/>
+    <converter:WidthPercentageConverter x:Key="WidthPercentageConverter"/>
 </ResourceDictionary>
