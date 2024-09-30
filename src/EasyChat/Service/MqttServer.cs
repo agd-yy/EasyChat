@@ -57,11 +57,11 @@ public class MqttService
 
             // 5. 设置 MqttServer 的属性
             // 设置消息订阅通知
-            server.ClientSubscribedTopicHandler = new MqttServerClientSubscribedTopicHandlerDelegate(SubScribedTopic);
+            //server.ClientSubscribedTopicHandler = new MqttServerClientSubscribedTopicHandlerDelegate(SubScribedTopic);
             // 设置消息退订通知
-            server.ClientUnsubscribedTopicHandler = new MqttServerClientUnsubscribedTopicHandlerDelegate(UnScribedTopic);
+            //server.ClientUnsubscribedTopicHandler = new MqttServerClientUnsubscribedTopicHandlerDelegate(UnScribedTopic);
             // 设置消息处理程序
-            server.UseApplicationMessageReceivedHandler(MessageReceived);
+            //server.UseApplicationMessageReceivedHandler(MessageReceived);
             // 设置客户端连接成功后的处理程序
             server.UseClientConnectedHandler(ClientConnected);
             // 设置客户端断开后的处理程序
@@ -130,16 +130,7 @@ public class MqttService
         var qos = args.ApplicationMessage.QualityOfServiceLevel;
         // 获取消息的保持形式
         var retain = args.ApplicationMessage.Retain;
-        // 收到其他客户端询问在线的机子
-        if (MqttContent.WHO_ONLINE.Equals(topic))
-        {
-            var msg = EncryptUtilities.Encrypt(new MsgModel()
-            {
-                userModels = onlineClientUids,
-                sendTime = DateTime.Now
-            }.Serialize());
-            ServierPublish(MqttContent.ONLINE, msg);
-        }
+
         Console.WriteLine($"客户端[{clientId}] >> 主题: [{topic}] 内容: [{payload}] Qos: [{qos}] Retain:[{retain}]");
     }
 

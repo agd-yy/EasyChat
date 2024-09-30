@@ -8,7 +8,6 @@ using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Protocol;
-using static System.Windows.Forms.Design.AxImporter;
 
 namespace EasyChat.Service;
 
@@ -24,7 +23,6 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
 
     private MyMqttClient()
     {
-        _topicSet.Add(MqttContent.WHO_ONLINE);
         _topicSet.Add(MqttContent.ONLINE);
         _topicSet.Add(MqttContent.MESSAGE + MyClientUid);
     }

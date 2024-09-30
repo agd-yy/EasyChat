@@ -52,8 +52,8 @@
                             </Ellipse>
                         </Border>
                         <Border Grid.Column="1" Grid.Row="0">
-                            <StackPanel Orientation="Vertical" >
-                                <TextBlock Text="{Binding NickName}" 
+                            <StackPanel Orientation="Vertical" MaxWidth ="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}, Converter={StaticResource WidthPercentageConverter}, ConverterParameter=0.99}">
+                                <TextBlock Text="{Binding NickName}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
                                      VerticalAlignment="Center" FontWeight="Bold"  Padding="3" FontSize="16"/>
                             </StackPanel>
                         </Border>

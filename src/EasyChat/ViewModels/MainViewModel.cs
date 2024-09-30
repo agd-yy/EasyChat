@@ -128,6 +128,10 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+    /// <summary>
+    /// 用户选择回调
+    /// </summary>
+    /// <param name="chatModel"></param>
     private void UserSelect(ChatModel chatModel)
     {
         if (chatModel == null)
@@ -178,7 +182,7 @@ public partial class MainViewModel : ObservableObject
 
     #region 私有方法
     /// <summary>
-    /// 处理群消息 需要增加新建群聊的功能
+    /// 处理群消息
     /// </summary>
     /// <param name="newMsg"></param>
     /// <param name="chats"></param>
@@ -235,6 +239,10 @@ public partial class MainViewModel : ObservableObject
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
     }
 
+    /// <summary>
+    /// 处理接收文件
+    /// </summary>
+    /// <param name="newMsg"></param>
     private void DealReceiveImageOrFile(MsgModel newMsg)
     {
         string base64String = newMsg.message;
@@ -244,6 +252,12 @@ public partial class MainViewModel : ObservableObject
 
     }
 
+    /// <summary>
+    /// 处理发送文件，基于Socket，通过MQTT获取到对方的ip
+    /// 参考：https://github.com/tevenfeng/tcpFileTrans
+    /// </summary>
+    /// <param name="topic"></param>
+    /// <param name="isGroupMsg"></param>
     private void DealSendImageOrFile(string topic, bool isGroupMsg)
     {
         byte[] fileBytes = File.ReadAllBytes("path/to/file");
