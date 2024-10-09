@@ -10,5 +10,7 @@ namespace EasyChat.Models
 
         public bool isOnline { get; set; } = true;
         public bool isGroup { get; set; } = false;
+
+        public string ipAddress { get; set; } = "";
     }
 }

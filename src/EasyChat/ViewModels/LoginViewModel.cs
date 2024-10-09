@@ -41,7 +41,7 @@ public partial class LoginViewModel : ObservableObject
         axr.BeginAnimation(AxisAngleRotation3D.AngleProperty,
             WindowUtilities.GetAnimation(180, TimeSpan.FromMilliseconds(500)));
         IpList = new BindingList<string>(NetworkUtilities.GetIps());
-        IpAddr = IpList.FirstOrDefault();
+        IpAddr = IpList.FirstOrDefault()??"";
     }
 
     [RelayCommand]

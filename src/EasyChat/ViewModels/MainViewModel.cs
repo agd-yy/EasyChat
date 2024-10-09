@@ -10,6 +10,8 @@ using EasyChat.ViewModels.SubVms;
 using System.IO;
 using Wpf.Ui.Appearance;
 using Wpf.Ui;
+using EasyChat.Utilities;
+using System.Windows.Forms;
 
 namespace EasyChat.ViewModels;
 
@@ -32,7 +34,8 @@ public partial class MainViewModel : ObservableObject
         {
             Uid = _myClient.MyClientUid,
             NickName = nickName,
-            Image = MqttContent.GetRandomImg()
+            Image = MqttContent.GetRandomImg(),
+            IpAddress = GetLocalIp(MqttContent.IPADDRESS)
         };
         UserListVm.Users.Add(MyChatModel);
         InitGroup();
@@ -61,7 +64,7 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-        Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             // 自己和群聊不删，其他都删(基本都是离线用户)
             foreach (var item in UserListVm.Users)
@@ -110,7 +113,7 @@ public partial class MainViewModel : ObservableObject
             Time = newMsg.sendTime.ToString(),
             IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid
         };
-        Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             if (newMsg.isGroupMsg)
             {
@@ -168,7 +171,7 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private void ClearNewMessage()
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             foreach (var item in UserListVm.Users)
             {
@@ -192,7 +195,7 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-        Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             if (_chatMessageDic.ContainsKey(newMsg.groupName))
             {
@@ -245,51 +248,19 @@ public partial class MainViewModel : ObservableObject
     /// <param name="newMsg"></param>
     private void DealReceiveImageOrFile(MsgModel newMsg)
     {
-        string base64String = newMsg.message;
 
-        // 1. 将 Base64 字符串转换为二进制文件
-        byte[] fileBytes = Convert.FromBase64String(base64String);
 
     }
 
     /// <summary>
-    /// 处理发送文件，基于Socket，通过MQTT获取到对方的ip
-    /// 参考：https://github.com/tevenfeng/tcpFileTrans
+    /// 处理发送文件，基于Socket
     /// </summary>
     /// <param name="topic"></param>
     /// <param name="isGroupMsg"></param>
     private void DealSendImageOrFile(string topic, bool isGroupMsg)
     {
-        byte[] fileBytes = File.ReadAllBytes("path/to/file");
-        int chunkSize = 1024 * 1024; // 每个分片的大小 (1 MB)
-        int totalChunks = (fileBytes.Length + chunkSize - 1) / chunkSize;
-        if (totalChunks > 100)
-        {
-            return;
-        }
-        for (int i = 0; i < totalChunks; i++)
-        {
-            int offset = i * chunkSize;
-            int length = Math.Min(chunkSize, fileBytes.Length - offset);
-            byte[] chunk = new byte[length];
-            Array.Copy(fileBytes, offset, chunk, 0, length);
-            var msgModel = new MsgModel
-            {
-                userModel = new UserModel()
-                {
-                    uid = MyChatModel.Uid,
-                    nickName = MyChatModel.NickName,
-                    image = MyChatModel.Image
-                },
-                sendTime = DateTime.Now,
-                message = Convert.ToBase64String(chunk),
-                isGroupMsg = isGroupMsg,
-                isImageOrFile = true,
-                thisChunk = i,
-                totalChunks = totalChunks
-            };
-            _myClient.SendMsg(topic, msgModel);
-        }
+
+
     }
     #endregion
 
@@ -338,7 +309,7 @@ public partial class MainViewModel : ObservableObject
         {
             if (!string.IsNullOrEmpty(SendMsg))
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
                     var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + _sendTopic;
@@ -410,7 +381,36 @@ public partial class MainViewModel : ObservableObject
             _themeService.SetTheme(ApplicationTheme.Dark);
         }
     }
-    
+
+    [RelayCommand]
+    private void FileBroser()
+    {
+        OpenFileDialog dialog = new OpenFileDialog();
+        dialog.Filter = "所有文件(*.*)|*.*";
+        dialog.Multiselect = true;
+        DialogResult result = dialog.ShowDialog();
+
+        if (result == DialogResult.OK)
+        {
+            string[] names = dialog.FileNames;
+            string[] namesWithoutDirectory = dialog.SafeFileNames;
+
+            //初始化一下两个字符串数组，之所以用names来初始化是为了保持大小一致
+            //filePaths = names;
+            //fileNames = namesWithoutDirectory;
+
+            foreach (string name in names)
+            {
+                FileInfo myFI = new FileInfo(name);
+
+                //添加到待发送文件列表中显示出来
+                ListViewItem tmp = new ListViewItem();
+                tmp.Text = myFI.Name;
+                tmp.SubItems.Add(myFI.DirectoryName);
+                //his.listView_fileSend.Items.Add(tmp);
+            }
+        }
+    }
     #endregion
 
     #region Property
@@ -454,6 +454,13 @@ public partial class MainViewModel : ObservableObject
             IsGroup = true
         });
         _chatMessageDic.TryAdd("群聊", new List<ChatMessage>());
+    }
+
+    private string GetLocalIp(string serverIP)
+    {
+        if (string.IsNullOrEmpty(serverIP)) return "";
+        var ipList = NetworkUtilities.GetIps();
+        return ipList.FirstOrDefault(x => x.StartsWith(serverIP.Split('.')[0]))??"";
     }
     #endregion
 }
