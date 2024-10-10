@@ -254,10 +254,11 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>
     /// 处理发送文件，基于Socket
+    /// 由于群发消息不能通过点对点实现，使用逆向方式
+    /// 
     /// </summary>
-    /// <param name="topic"></param>
     /// <param name="isGroupMsg"></param>
-    private void DealSendImageOrFile(string topic, bool isGroupMsg)
+    private void DealSendImageOrFile(bool isGroupMsg)
     {
 
 
@@ -462,5 +463,7 @@ public partial class MainViewModel : ObservableObject
         var ipList = NetworkUtilities.GetIps();
         return ipList.FirstOrDefault(x => x.StartsWith(serverIP.Split('.')[0]))??"";
     }
+
+
     #endregion
 }

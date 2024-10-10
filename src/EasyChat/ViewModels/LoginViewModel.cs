@@ -13,6 +13,24 @@ namespace EasyChat.ViewModels;
 
 public partial class LoginViewModel : ObservableObject
 {
+    private IList<string> _myIps = new List<string>();
+    // 构造方法
+    public LoginViewModel()
+    {
+        _myIps = NetworkUtilities.GetIps();
+        Task.Run(() =>
+        {
+            foreach (var ip in _myIps)
+            {
+                if(ip == "127.0.0.1")
+                {
+                    continue;
+                }
+                _= NetworkUtilities.ScanLocalNetwork(ip);
+            }
+        });
+    }
+
     [ObservableProperty] private bool isServer;
 
     /// <summary>
@@ -40,7 +58,7 @@ public partial class LoginViewModel : ObservableObject
             return;
         axr.BeginAnimation(AxisAngleRotation3D.AngleProperty,
             WindowUtilities.GetAnimation(180, TimeSpan.FromMilliseconds(500)));
-        IpList = new BindingList<string>(NetworkUtilities.GetIps());
+        IpList = new BindingList<string>(_myIps);
         IpAddr = IpList.FirstOrDefault()??"";
     }
 
