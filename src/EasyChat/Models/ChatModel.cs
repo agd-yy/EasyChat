@@ -26,4 +26,5 @@ public partial class ChatModel : ObservableObject
     [ObservableProperty] private bool isOnline = true;
     [ObservableProperty] private bool isGroup = false;
     [ObservableProperty] private string ipAddress = "";
+    [ObservableProperty] private int port = 9100;
 }

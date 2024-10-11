@@ -1,135 +1,69 @@
 ﻿using System.IO;
 using System.Net.Sockets;
-using System.Net;
 
 namespace EasyChat.Service
 {
     public class SocketClient
     {
-        #region properties
+        private string _serverIP;
+        private int _serverPort;
 
-        /// <summary>
-        /// 存储远程端点的ip
-        /// </summary>
-        private string ip;
-        /// <summary>
-        /// 存储软件所用到的端口
-        /// </summary>
-        private int port;
-        /// <summary>
-        /// 远程端点
-        /// </summary>
-        private IPEndPoint iep;
-        /// <summary>
-        /// 文件流，用于读取文件
-        /// </summary>
-        private FileStream? fs;
-        /// <summary>
-        /// tcp连接
-        /// </summary>
-        private TcpClient? myTcpClient;
-        /// <summary>
-        /// 从tcp连接建立以后获取的网络流
-        /// </summary>
-        private NetworkStream? ns;
-        /// <summary>
-        /// 用于发送文件名
-        /// </summary>
-        private BinaryWriter? bw;
-
-        #endregion
-
-        #region 构造函数
-
-        /// <summary>
-        /// 根据指定ip和端口号建立一个tcp连接
-        /// </summary>
-        /// <param name="ipToConnect">远程端点的ip</param>
-        /// <param name="portToConnect">tcp连接使用的端口号</param>
-        public SocketClient(string ipToConnect, int portToConnect)
+        public SocketClient(string serverIP, int serverPort)
         {
-            this.ip = ipToConnect;
-            this.port = portToConnect;
-            this.iep = new IPEndPoint(IPAddress.Parse(ip), port);
+            _serverIP = serverIP;
+            _serverPort = serverPort;
         }
 
-        #endregion
-
-        #region methods
-
-        /// <summary>
-        /// 建立连接，成功返回true，否则返回false
-        /// </summary>
-        /// <returns></returns>
-        public bool Connect()
+        // 发送文件
+        public async Task SendFileAsync(string filePath)
         {
-            bool result = false;
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
 
             try
             {
-                this.myTcpClient = new TcpClient();
-
-                this.myTcpClient.Connect(iep);
-                if (myTcpClient != null)
+                using (TcpClient client = new TcpClient(_serverIP, _serverPort))
+                using (NetworkStream networkStream = client.GetStream())
                 {
-                    this.ns = myTcpClient.GetStream();
+                    FileInfo fileInfo = new FileInfo(filePath);
+
+                    // 获取文件名和文件大小
+                    string fileName = fileInfo.Name;
+                    long fileSize = fileInfo.Length;
+
+                    // 发送文件名长度
+                    byte[] fileNameBytes = System.Text.Encoding.UTF8.GetBytes(fileName);
+                    byte[] fileNameLengthBytes = BitConverter.GetBytes(fileNameBytes.Length);
+                    await networkStream.WriteAsync(fileNameLengthBytes, 0, fileNameLengthBytes.Length);
+
+                    // 发送文件名
+                    await networkStream.WriteAsync(fileNameBytes, 0, fileNameBytes.Length);
+
+                    // 发送文件大小
+                    byte[] fileSizeBytes = BitConverter.GetBytes(fileSize);
+                    await networkStream.WriteAsync(fileSizeBytes, 0, fileSizeBytes.Length);
+
+                    //Console.WriteLine($"开始发送文件：{fileName}, 大小：{fileSize} bytes");
+
+                    // 发送文件内容
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+
+                        while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            await networkStream.WriteAsync(buffer, 0, bytesRead);
+                        }
+                    }
                 }
-
-                result = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                result = false;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// 发送指定路径的文件
-        /// </summary>
-        /// <param name="filePath">要发送文件的路径</param>
-        public void sendFile(string filePath)
-        {
-            string path = filePath;
-            this.fs = new FileStream(path, FileMode.Open);
-
-            int size = 0;
-            int len = 0;
-            while (len < fs.Length)
-            {
-                byte[] buffer = new byte[512];
-                size = fs.Read(buffer, 0, buffer.Length);
-                ns?.Write(buffer, 0, size);
-                len += size;
-            }
-            fs.Flush();
-            ns?.Flush();
-            fs.Close();
-            ns?.Close();
-        }
-
-        /// <summary>
-        /// 发送指定文件的文件名
-        /// </summary>
-        /// <param name="fileName">要发送的文件的文件名</param>
-        public void sendName(string fileName)
-        {
-            try
-            {
-                string nameToSend = fileName;
-                this.bw = new BinaryWriter(ns);
-
-                bw.Write(fileName);
-                bw.Flush();
-                ns.Flush();
-            }
-            catch (Exception)
-            {
-
+                Console.WriteLine($"文件发送失败：{ex.Message}");
             }
         }
-
-        #endregion
     }
 }

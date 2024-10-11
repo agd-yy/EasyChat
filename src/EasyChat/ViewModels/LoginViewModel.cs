@@ -26,7 +26,7 @@ public partial class LoginViewModel : ObservableObject
                 {
                     continue;
                 }
-                _= NetworkUtilities.ScanLocalNetwork(ip);
+                //_= NetworkUtilities.ScanLocalNetwork(ip);
             }
         });
     }

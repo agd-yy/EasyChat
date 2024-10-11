@@ -6,117 +6,97 @@ namespace EasyChat.Service
 {
     public class SocketServer
     {
-        #region properties
+        private TcpListener _tcpListener;
+        private string _saveDirectory;
 
-        /// <summary>
-        /// 监听器
-        /// </summary>
-        private TcpListener myListener;
-        /// <summary>
-        /// 监听的端口
-        /// </summary>
-        private int port;
-        /// <summary>
-        /// 收到的文件的存储路径
-        /// </summary>
-        private string savePath;
-        /// <summary>
-        /// 二进制流，用于发送文件名
-        /// </summary>
-        private BinaryReader? br;
-        /// <summary>
-        /// 用于存储收到的文件名和路径，方便更新已接收文件列表
-        /// </summary>
-        private Dictionary<string, string> dict = new Dictionary<string, string>();
-
-        #endregion
-
-        #region 构造函数
-
-        /// <summary>
-        /// 指定端口和接受文件存储路径，构造一个服务器tcp监听器
-        /// </summary>
-        /// <param name="port">监听的端口</param>
-        /// <param name="savePath">接收文件的存储路径</param>
-        public SocketServer(int port, string savePath)
+        public SocketServer(int port, string saveDirectory)
         {
-            this.port = port;
-            this.savePath = savePath;
-
-            //开始监听文件传输端口
-            this.myListener = new TcpListener(IPAddress.Any, this.port);
-            this.myListener.Start();
-
-            //开新线程来接收消息和文件
-            Thread recvThread = new Thread(ReceiveMsg);
-            recvThread.Start();
-            recvThread.IsBackground = true;
-
-
+            _saveDirectory = saveDirectory;
+            _tcpListener = OkPort(port);
         }
 
-        #endregion
-
-        #region methods
-
-        /// <summary>
-        /// 创建监听线程调用的线程方法，监听并接受文件名和文件
-        /// </summary>
-        public void ReceiveMsg()
+        private TcpListener OkPort(int port)
         {
-            while (true)
+            try
             {
-                try
-                {
-                    //缓冲区大小
-                    int size = 0;
-                    //已发送长度
-                    int len = 0;
-                    TcpClient client = myListener.AcceptTcpClient();
-
-                    NetworkStream stream = client.GetStream();
-
-                    if (stream != null)
-                    {
-                        br = new BinaryReader(stream);
-                        string name = br.ReadString();
-
-                        string fileSavePath = this.savePath + "\\" + name;//获得用户保存文件的路径
-                        FileStream fs = new FileStream(fileSavePath, FileMode.Create, FileAccess.Write);
-
-                        byte[] buffer = new byte[512];
-                        while ((size = stream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            fs.Write(buffer, 0, size);
-                            len += size;
-                        }
-
-                        //将已接收的文件名和存储路径放入dict中方便更新已接受文件列表
-                        dict.Add(name, fileSavePath);
-
-                        fs.Flush();
-                        stream.Flush();
-                        stream.Close();
-                        client.Close();
-                    }
-
-                }
-                catch (Exception ex)
-                {
-
-                }
+                var tcpListener = new TcpListener(IPAddress.Any, port);
+                return tcpListener;
+            }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                return OkPort(port++);
             }
         }
 
-        /// <summary>
-        /// 获取已接收文件的文件名和存储路径，用于在界面上更新已接收文件列表
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<string, string> getDict()
+        // 开始监听
+        public async Task StartListeningAsync()
         {
-            return dict;
+            _tcpListener.Start();
+            while (true)
+            {
+                TcpClient client = await _tcpListener.AcceptTcpClientAsync();
+                _ = Task.Run(() => ReceiveFileAsync(client));
+            }
         }
 
-        #endregion
+        // 接收文件
+        private async Task ReceiveFileAsync(TcpClient client)
+        {
+            try
+            {
+                using (NetworkStream networkStream = client.GetStream())
+                {
+                    // 读取文件名长度
+                    byte[] fileNameLengthBuffer = new byte[4];
+                    await networkStream.ReadAsync(fileNameLengthBuffer, 0, fileNameLengthBuffer.Length);
+                    int fileNameLength = BitConverter.ToInt32(fileNameLengthBuffer, 0);
+
+                    // 读取文件名
+                    byte[] fileNameBuffer = new byte[fileNameLength];
+                    await networkStream.ReadAsync(fileNameBuffer, 0, fileNameBuffer.Length);
+                    string fileName = System.Text.Encoding.UTF8.GetString(fileNameBuffer);
+
+                    // 读取文件大小
+                    byte[] fileSizeBuffer = new byte[8];
+                    await networkStream.ReadAsync(fileSizeBuffer, 0, fileSizeBuffer.Length);
+                    long fileSize = BitConverter.ToInt64(fileSizeBuffer, 0);
+
+                    //Console.WriteLine($"正在接收文件：{fileName}, 大小：{fileSize} bytes");
+
+                    // 准备文件保存路径
+                    string savePath = Path.Combine(_saveDirectory, fileName);
+
+                    // 接收文件内容并写入到本地文件
+                    using (FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write))
+                    {
+                        byte[] buffer = new byte[4096];
+                        long totalBytesReceived = 0;
+                        int bytesRead;
+
+                        while (totalBytesReceived < fileSize && (bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            await fileStream.WriteAsync(buffer, 0, bytesRead);
+                            totalBytesReceived += bytesRead;
+                        }
+                    }
+
+                    //Console.WriteLine($"文件接收完成，保存路径：{savePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine($"文件接收失败：{ex.Message}");
+            }
+            finally
+            {
+                client.Close();  // 及时关闭客户端连接，释放资源
+            }
+        }
+
+        // 停止监听
+        public void StopListening()
+        {
+            _tcpListener.Stop();
+        }
     }
 }

@@ -150,15 +150,7 @@ public partial class MainViewModel : ObservableObject
                 _eventHelper.StopBlink();
             }
             chatModel.MessageCount = 0;
-            ChatObj = new ChatModel()
-            {
-                NickName = chatModel.NickName,
-                Uid = chatModel.Uid,
-                Image = chatModel.Image,
-                IsGroup = chatModel.IsGroup,
-                GroupName = chatModel.GroupName,
-                MessageCount = 0
-            };
+            ChatObj = chatModel;
             ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[chatModel.Uid]);
         }
         catch (Exception)
@@ -240,15 +232,47 @@ public partial class MainViewModel : ObservableObject
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
+        if(newMsg.isImageOrFile)
+        {
+            DealReceiveImageOrFile();
+        }
     }
 
     /// <summary>
     /// 处理接收文件
     /// </summary>
     /// <param name="newMsg"></param>
-    private void DealReceiveImageOrFile(MsgModel newMsg)
+    private void DealReceiveImageOrFile()
     {
+        try
+        {
+            // 创建并显示保存文件的对话框
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "选择保存文件的位置",
+                Filter = "All Files (*.*)|*.*",
+                FileName = "received_file"
+            };
 
+            // 显示对话框并检查用户是否点击了“保存”按钮
+            var result = saveFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                // 获取用户选择的文件路径
+                string selectedPath = saveFileDialog.FileName;
+
+                // 如果用户选择了路径，则启动文件接收操作
+                if (!string.IsNullOrEmpty(selectedPath))
+                {
+                    var socketServer = new SocketServer(9100, selectedPath);
+                    _= socketServer.StartListeningAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            EcMsgBox.Show($"文件处理过程中发生错误：{ex.Message}");
+        }
 
     }
 
@@ -260,7 +284,13 @@ public partial class MainViewModel : ObservableObject
     /// <param name="isGroupMsg"></param>
     private void DealSendImageOrFile(bool isGroupMsg)
     {
-
+        if (isGroupMsg)
+        {
+            EcMsgBox.Show("暂不支持群文件~");
+            return;
+        }
+        var sockeClient = new SocketClient(ChatObj.IpAddress, 9100);
+        _= sockeClient.SendFileAsync("‪D:\\login.png");
 
     }
     #endregion
