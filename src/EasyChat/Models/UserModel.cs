@@ -12,5 +12,6 @@ namespace EasyChat.Models
         public bool isGroup { get; set; } = false;
 
         public string ipAddress { get; set; } = "";
+        public int port { get; set; } = MqttContent.SOCKET_PORT;
     }
 }

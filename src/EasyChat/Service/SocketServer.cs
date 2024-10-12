@@ -6,13 +6,21 @@ namespace EasyChat.Service
 {
     public class SocketServer
     {
+        private static SocketServer? _instance;
         private TcpListener _tcpListener;
-        private string _saveDirectory;
 
-        public SocketServer(int port, string saveDirectory)
+        private SocketServer(int port)
         {
-            _saveDirectory = saveDirectory;
             _tcpListener = OkPort(port);
+            _tcpListener.Start();
+        }
+        public static SocketServer GetInstance(int port)
+        {
+            if (_instance == null)
+            {
+                _instance = new SocketServer(port);
+            }
+            return _instance;
         }
 
         private TcpListener OkPort(int port)
@@ -24,28 +32,28 @@ namespace EasyChat.Service
             }
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
             {
-                return OkPort(port++);
+                return OkPort(++port);
             }
         }
 
         // 开始监听
-        public async Task StartListeningAsync()
+        public async Task StartReceiveAsync(string savedirectory)
         {
-            _tcpListener.Start();
             while (true)
             {
                 TcpClient client = await _tcpListener.AcceptTcpClientAsync();
-                _ = Task.Run(() => ReceiveFileAsync(client));
+                _ = Task.Run(() => ReceiveFileAsync(client, savedirectory));
             }
         }
 
         // 接收文件
-        private async Task ReceiveFileAsync(TcpClient client)
+        private async Task ReceiveFileAsync(TcpClient client, string savedirectory)
         {
             try
             {
                 using (NetworkStream networkStream = client.GetStream())
                 {
+                    networkStream.ReadTimeout = 5000;
                     // 读取文件名长度
                     byte[] fileNameLengthBuffer = new byte[4];
                     await networkStream.ReadAsync(fileNameLengthBuffer, 0, fileNameLengthBuffer.Length);
@@ -54,20 +62,14 @@ namespace EasyChat.Service
                     // 读取文件名
                     byte[] fileNameBuffer = new byte[fileNameLength];
                     await networkStream.ReadAsync(fileNameBuffer, 0, fileNameBuffer.Length);
-                    string fileName = System.Text.Encoding.UTF8.GetString(fileNameBuffer);
 
                     // 读取文件大小
                     byte[] fileSizeBuffer = new byte[8];
                     await networkStream.ReadAsync(fileSizeBuffer, 0, fileSizeBuffer.Length);
                     long fileSize = BitConverter.ToInt64(fileSizeBuffer, 0);
 
-                    //Console.WriteLine($"正在接收文件：{fileName}, 大小：{fileSize} bytes");
-
-                    // 准备文件保存路径
-                    string savePath = Path.Combine(_saveDirectory, fileName);
-
                     // 接收文件内容并写入到本地文件
-                    using (FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write))
+                    using (FileStream fileStream = new FileStream(savedirectory, FileMode.Create, FileAccess.Write))
                     {
                         byte[] buffer = new byte[4096];
                         long totalBytesReceived = 0;
@@ -80,20 +82,19 @@ namespace EasyChat.Service
                         }
                     }
 
-                    //Console.WriteLine($"文件接收完成，保存路径：{savePath}");
+                    //System.Diagnostics.Debug.WriteLine($"文件接收完成，保存路径：{savedirectory}");
                 }
             }
             catch (Exception ex)
             {
-                //Console.WriteLine($"文件接收失败：{ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"文件接收失败：{ex.Message}");
             }
             finally
             {
-                client.Close();  // 及时关闭客户端连接，释放资源
+                client.Close();
             }
         }
 
-        // 停止监听
         public void StopListening()
         {
             _tcpListener.Stop();

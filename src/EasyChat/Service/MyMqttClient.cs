@@ -20,10 +20,12 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     // 页面事件
     public event Action<MsgModel>? ReceiveMsgEvent;
     public event Action<MsgModel>? OnlinePersonEvent;
+    public event Action<MsgModel>? FileSendEvent;
 
     private MyMqttClient()
     {
         _topicSet.Add(MqttContent.ONLINE);
+        _topicSet.Add(MqttContent.FILE);
         _topicSet.Add(MqttContent.MESSAGE + MyClientUid);
     }
 
@@ -183,20 +185,25 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
             {
                 return;
             }
-            // 全局消息 or 群消息
             if (args.ApplicationMessage.Topic.Equals(MqttContent.MESSAGE) || args.ApplicationMessage.Topic.Contains(MqttContent.GROUP))
             {
+                // 全局消息 or 群消息
                 ReceiveMsgEvent?.Invoke(msgModel);
             }
-            // 收到其他客户端在线消息
             else if (args.ApplicationMessage.Topic.Equals(MqttContent.ONLINE))
             {
+                // 收到其他客户端在线消息
                 OnlinePersonEvent?.Invoke(msgModel);
             }
-            // 私发消息
             else if (args.ApplicationMessage.Topic.Contains(MyClientUid))
             {
+                // 私发消息
                 ReceiveMsgEvent?.Invoke(msgModel);
+            }
+            else if (args.ApplicationMessage.Topic.Equals(MqttContent.FILE))
+            {
+                // 文件相关
+                FileSendEvent?.Invoke(msgModel);
             }
         }
         catch

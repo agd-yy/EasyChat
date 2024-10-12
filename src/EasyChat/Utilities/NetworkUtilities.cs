@@ -71,7 +71,7 @@ public class NetworkUtilities
                     lock (activeIPs) // 加锁避免多线程操作冲突
                     {
                         activeIPs.Add(ipAddress);
-                        System.Diagnostics.Debug.WriteLine(ipAddress);
+                        //System.Diagnostics.Debug.WriteLine(ipAddress);
                     }
                 }
             }

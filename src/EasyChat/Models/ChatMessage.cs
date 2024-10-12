@@ -20,4 +20,14 @@ public partial class ChatMessage : ObservableObject
     [ObservableProperty] private string? separatorTitle;
 
     [ObservableProperty] private string color = "#ff82a3";
+
+    [ObservableProperty] private bool isFile;
+
+    [ObservableProperty] private string? fileName;
+
+    [ObservableProperty] private string? fileSize;
+
+    [ObservableProperty] private string? filePath;
+
+    [ObservableProperty] private bool isReceived;
 }

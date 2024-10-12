@@ -10,7 +10,6 @@ using EasyChat.ViewModels.SubVms;
 using System.IO;
 using Wpf.Ui.Appearance;
 using Wpf.Ui;
-using EasyChat.Utilities;
 using System.Windows.Forms;
 
 namespace EasyChat.ViewModels;
@@ -21,6 +20,7 @@ public partial class MainViewModel : ObservableObject
     private EventHelper _eventHelper = EventHelper.Instance;
     private string _sendTopic = string.Empty;
     ThemeService _themeService = new ThemeService();
+    SocketServer _socketServer;
     // 新消息总数
     private int _allNewMessageCount = 0;
     // <uid , uid对应全部消息>
@@ -35,14 +35,17 @@ public partial class MainViewModel : ObservableObject
             Uid = _myClient.MyClientUid,
             NickName = nickName,
             Image = MqttContent.GetRandomImg(),
-            IpAddress = GetLocalIp(MqttContent.IPADDRESS)
+            IpAddress = MqttContent.GetLocalIp(MqttContent.IPADDRESS),
+            Port = MqttContent.GetLocalOkPort(MqttContent.SOCKET_PORT, null)
         };
+        _socketServer = SocketServer.GetInstance(MyChatModel.Port);
         UserListVm.Users.Add(MyChatModel);
         InitGroup();
         //启动客户端
         _myClient.StartClient(MqttContent.IPADDRESS, MyChatModel);
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
+        _myClient.FileSendEvent += ClientChangeReceiveFile;
         // 用户选择回调
         UserListVm.OnSelected += UserSelect;
         UserListVm.RightClicked += Nothing;
@@ -88,7 +91,9 @@ public partial class MainViewModel : ObservableObject
                     Image = userModel.image,
                     NickName = userModel.isOnline ? userModel.nickName : userModel.nickName + MqttContent.OFFLINE_STRING,
                     IsOnline = userModel.isOnline,
-                    IsGroup = userModel.isGroup
+                    IsGroup = userModel.isGroup,
+                    IpAddress = userModel.ipAddress,
+                    Port = userModel.port
                 });
                 if (!_chatMessageDic.ContainsKey(userModel.uid))
                 {
@@ -111,7 +116,11 @@ public partial class MainViewModel : ObservableObject
             Image = string.IsNullOrEmpty(newMsg.userModel.image) ? MqttContent.GetRandomImg() : newMsg.userModel.image,
             Message = newMsg.message,
             Time = newMsg.sendTime.ToString(),
-            IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid
+            IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid,
+            IsFile = newMsg.isImageOrFile,
+            FilePath = newMsg.clientFilePath,
+            FileSize = newMsg.fileSize,
+            FileName = newMsg.fileName
         };
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
@@ -131,6 +140,22 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+    /// <summary>
+    /// 客户端接收文件
+    /// </summary>
+    /// <param name="newMsg"></param>
+    private void ClientChangeReceiveFile(MsgModel newMsg)
+    {
+        //if (newMsg.userModel.uid == MyChatModel.Uid)
+        //{
+        //    return;
+        //}
+        // 服务端准备好接收文件了
+        if (newMsg.isServerReceived)
+        {
+            DealSendImageOrFile(newMsg.isGroupMsg, newMsg.clientFilePath);
+        }
+    }
     /// <summary>
     /// 用户选择回调
     /// </summary>
@@ -232,9 +257,10 @@ public partial class MainViewModel : ObservableObject
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
-        if(newMsg.isImageOrFile)
+        // TODO 这里应该是用户点击下载才会进入DealReceiveImageOrFile
+        if (newMsg.isImageOrFile)
         {
-            DealReceiveImageOrFile();
+            DealReceiveImageOrFile(chats);
         }
     }
 
@@ -242,55 +268,66 @@ public partial class MainViewModel : ObservableObject
     /// 处理接收文件
     /// </summary>
     /// <param name="newMsg"></param>
-    private void DealReceiveImageOrFile()
+    private void DealReceiveImageOrFile(ChatMessage chats)
     {
+        _myClient.SendMsg(MqttContent.FILE, new MsgModel
+        {
+            userModel = new UserModel()
+            {
+                uid = MyChatModel.Uid,
+                nickName = MyChatModel.NickName,
+                image = MyChatModel.Image,
+                ipAddress = MyChatModel.IpAddress,
+                port = MyChatModel.Port
+            },
+            sendTime = DateTime.Now,
+            message = SendMsg,
+            isGroupMsg = ChatObj.IsGroup,
+            isServerReceived = true,
+            groupName = ChatObj.GroupName,
+            isImageOrFile = chats.IsFile,
+            fileName = chats.FileName,
+            clientFilePath = chats.FilePath
+        });
         try
         {
-            // 创建并显示保存文件的对话框
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Title = "选择保存文件的位置",
                 Filter = "All Files (*.*)|*.*",
-                FileName = "received_file"
+                FileName = chats.FileName,
             };
-
-            // 显示对话框并检查用户是否点击了“保存”按钮
+            saveFileDialog.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), ""); ;
             var result = saveFileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                // 获取用户选择的文件路径
-                string selectedPath = saveFileDialog.FileName;
-
-                // 如果用户选择了路径，则启动文件接收操作
-                if (!string.IsNullOrEmpty(selectedPath))
+                var localFilePath = saveFileDialog.FileName;
+                if (!string.IsNullOrEmpty(localFilePath))
                 {
-                    var socketServer = new SocketServer(9100, selectedPath);
-                    _= socketServer.StartListeningAsync();
+                    _= _socketServer.StartReceiveAsync(localFilePath);
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            EcMsgBox.Show($"文件处理过程中发生错误：{ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"文件处理发生错误");
         }
 
     }
 
     /// <summary>
     /// 处理发送文件，基于Socket
-    /// 由于群发消息不能通过点对点实现，使用逆向方式
-    /// 
     /// </summary>
     /// <param name="isGroupMsg"></param>
-    private void DealSendImageOrFile(bool isGroupMsg)
+    private void DealSendImageOrFile(bool isGroupMsg, string filePath)
     {
         if (isGroupMsg)
         {
             EcMsgBox.Show("暂不支持群文件~");
             return;
         }
-        var sockeClient = new SocketClient(ChatObj.IpAddress, 9100);
-        _= sockeClient.SendFileAsync("‪D:\\login.png");
+        var sockeClient = SocketClient.GetInctance(ChatObj.IpAddress, ChatObj.Port);
+        _= sockeClient.SendFileAsync(filePath);
 
     }
     #endregion
@@ -350,12 +387,17 @@ public partial class MainViewModel : ObservableObject
                         {
                             uid = MyChatModel.Uid,
                             nickName = MyChatModel.NickName,
-                            image = MyChatModel.Image
+                            image = MyChatModel.Image,
+                            ipAddress = MyChatModel.IpAddress,
+                            port = MyChatModel.Port
                         },
                         sendTime = DateTime.Now,
                         message = SendMsg,
                         isGroupMsg = isGroupMsg,
                         groupName = ChatObj.GroupName,
+                        //isImageOrFile = true,
+                        fileName = "CFxxxx_demoV2.0.2(1).zip",
+                        clientFilePath = "D:\\CFxxxx_demoV2.0.2(1).zip"
                     };
                     _myClient.SendMsg(topic, msgModel);
                     if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
@@ -486,14 +528,5 @@ public partial class MainViewModel : ObservableObject
         });
         _chatMessageDic.TryAdd("群聊", new List<ChatMessage>());
     }
-
-    private string GetLocalIp(string serverIP)
-    {
-        if (string.IsNullOrEmpty(serverIP)) return "";
-        var ipList = NetworkUtilities.GetIps();
-        return ipList.FirstOrDefault(x => x.StartsWith(serverIP.Split('.')[0]))??"";
-    }
-
-
     #endregion
 }
