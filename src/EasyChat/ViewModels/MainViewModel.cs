@@ -20,9 +20,9 @@ public partial class MainViewModel : ObservableObject
     private EventHelper _eventHelper = EventHelper.Instance;
     private string _sendTopic = string.Empty;
     ThemeService _themeService = new ThemeService();
-    SocketServer _socketServer;
     // 新消息总数
     private int _allNewMessageCount = 0;
+    SocketServer _socketServer;
     // <uid , uid对应全部消息>
     private readonly Dictionary<string, List<ChatMessage>> _chatMessageDic = new Dictionary<string, List<ChatMessage>>();
 
@@ -38,11 +38,11 @@ public partial class MainViewModel : ObservableObject
             IpAddress = MqttContent.GetLocalIp(MqttContent.IPADDRESS),
             Port = MqttContent.GetLocalOkPort(MqttContent.SOCKET_PORT, null)
         };
-        _socketServer = SocketServer.GetInstance(MyChatModel.Port);
         UserListVm.Users.Add(MyChatModel);
         InitGroup();
         //启动客户端
         _myClient.StartClient(MqttContent.IPADDRESS, MyChatModel);
+        _socketServer = SocketServer.GetInstance(MyChatModel.Port);
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
         _myClient.FileSendEvent += ClientChangeReceiveFile;
@@ -84,17 +84,7 @@ public partial class MainViewModel : ObservableObject
                 {
                     continue;
                 }
-                UserListVm.Users.Add(new ChatModel()
-                {
-                    GroupName = userModel.nickName,
-                    Uid = userModel.uid,
-                    Image = userModel.image,
-                    NickName = userModel.isOnline ? userModel.nickName : userModel.nickName + MqttContent.OFFLINE_STRING,
-                    IsOnline = userModel.isOnline,
-                    IsGroup = userModel.isGroup,
-                    IpAddress = userModel.ipAddress,
-                    Port = userModel.port
-                });
+                UserListVm.Users.Add(MqttContent.ToChatModel(userModel));
                 if (!_chatMessageDic.ContainsKey(userModel.uid))
                 {
                     _chatMessageDic.Add(userModel.uid, new List<ChatMessage>());
@@ -110,18 +100,7 @@ public partial class MainViewModel : ObservableObject
     /// <param name="newMsg"></param>
     private void ClientChangeReceiveMsg(MsgModel newMsg)
     {
-        ChatMessage chats = new ChatMessage
-        {
-            NickName = newMsg.userModel.nickName,
-            Image = string.IsNullOrEmpty(newMsg.userModel.image) ? MqttContent.GetRandomImg() : newMsg.userModel.image,
-            Message = newMsg.message,
-            Time = newMsg.sendTime.ToString(),
-            IsMyMessage = newMsg.userModel.uid == MyChatModel.Uid,
-            IsFile = newMsg.isImageOrFile,
-            FilePath = newMsg.clientFilePath,
-            FileSize = newMsg.fileSize,
-            FileName = newMsg.fileName
-        };
+        ChatMessage chats = MqttContent.ToChatMessage(newMsg, MyChatModel.Uid);
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             if (newMsg.isGroupMsg)
@@ -272,14 +251,7 @@ public partial class MainViewModel : ObservableObject
     {
         _myClient.SendMsg(MqttContent.FILE, new MsgModel
         {
-            userModel = new UserModel()
-            {
-                uid = MyChatModel.Uid,
-                nickName = MyChatModel.NickName,
-                image = MyChatModel.Image,
-                ipAddress = MyChatModel.IpAddress,
-                port = MyChatModel.Port
-            },
+            userModel = MqttContent.ToUserModel(MyChatModel),
             sendTime = DateTime.Now,
             message = SendMsg,
             isGroupMsg = ChatObj.IsGroup,
@@ -319,7 +291,7 @@ public partial class MainViewModel : ObservableObject
     /// 处理发送文件，基于Socket
     /// </summary>
     /// <param name="isGroupMsg"></param>
-    private void DealSendImageOrFile(bool isGroupMsg, string filePath)
+    private void DealSendImageOrFile(bool isGroupMsg, string? filePath)
     {
         if (isGroupMsg)
         {
@@ -383,14 +355,7 @@ public partial class MainViewModel : ObservableObject
                     var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + _sendTopic;
                     var msgModel = new MsgModel
                     {
-                        userModel = new UserModel()
-                        {
-                            uid = MyChatModel.Uid,
-                            nickName = MyChatModel.NickName,
-                            image = MyChatModel.Image,
-                            ipAddress = MyChatModel.IpAddress,
-                            port = MyChatModel.Port
-                        },
+                        userModel =  MqttContent.ToUserModel(MyChatModel),
                         sendTime = DateTime.Now,
                         message = SendMsg,
                         isGroupMsg = isGroupMsg,
@@ -404,14 +369,7 @@ public partial class MainViewModel : ObservableObject
                     {
                         if (_chatMessageDic.ContainsKey(_sendTopic))
                         {
-                            _chatMessageDic[_sendTopic].Add(new ChatMessage
-                            {
-                                NickName = MyChatModel.NickName,
-                                Image = MyChatModel.Image,
-                                Message = msgModel.message,
-                                Time = msgModel.sendTime.ToString(),
-                                IsMyMessage = true
-                            });
+                            _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModel, MyChatModel.Uid));
                             UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
                             UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
                             ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);

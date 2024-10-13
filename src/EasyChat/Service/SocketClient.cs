@@ -26,9 +26,9 @@ namespace EasyChat.Service
         }
 
         // 发送文件
-        public async Task SendFileAsync(string filePath)
+        public async Task SendFileAsync(string? filePath)
         {
-            if (!File.Exists(filePath))
+            if (filePath == null || !File.Exists(filePath))
             {
                 //System.Diagnostics.Debug.WriteLine("文件不存在");
                 return;

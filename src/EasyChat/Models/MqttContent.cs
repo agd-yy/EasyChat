@@ -63,7 +63,63 @@ public static class MqttContent
         return port;
     }
 
-    // MQTT消息转界面消息 MsgModel -> ChatMessage
+    /// <summary>
+    /// MsgModel -> ChatMessage
+    /// </summary>
+    /// <param name="msgModel"></param>
+    /// <param name="myUid"></param>
+    /// <returns></returns>
+    public static ChatMessage ToChatMessage(MsgModel msgModel, string myUid)
+    {
+        return new ChatMessage
+        {
+            NickName = msgModel.userModel.nickName,
+            Image = string.IsNullOrEmpty(msgModel.userModel.image) ? GetRandomImg() : msgModel.userModel.image,
+            Message = msgModel.message,
+            Time = msgModel.sendTime.ToString(),
+            IsMyMessage = msgModel.userModel.uid == myUid,
+            IsFile = msgModel.isImageOrFile,
+            FilePath = msgModel.clientFilePath,
+            FileSize = msgModel.fileSize,
+            FileName = msgModel.fileName
+        };
+    }
 
-    // 界面聊天用户 转 用户 ChatModel -> UserModel
+
+    /// <summary>
+    /// ChatModel -> UserModel
+    /// </summary>
+    /// <param name="chatModel"></param>
+    /// <returns></returns>
+    public static UserModel ToUserModel(ChatModel chatModel)
+    {
+        return new UserModel()
+        {
+            uid = chatModel.Uid,
+            nickName = chatModel.NickName,
+            image = chatModel.Image,
+            ipAddress = chatModel.IpAddress,
+            port = chatModel.Port
+        };
+    }
+
+    /// <summary>
+    /// UserModel -> ChatModel
+    /// </summary>
+    /// <param name="userModel"></param>
+    /// <returns></returns>
+    public static ChatModel ToChatModel(UserModel userModel)
+    {
+        return new ChatModel()
+        {
+            GroupName = userModel.nickName,
+            Uid = userModel.uid,
+            Image = userModel.image,
+            NickName = userModel.isOnline ? userModel.nickName : userModel.nickName + OFFLINE_STRING,
+            IsOnline = userModel.isOnline,
+            IsGroup = userModel.isGroup,
+            IpAddress = userModel.ipAddress,
+            Port = userModel.port
+        };
+    }
 }
