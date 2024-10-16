@@ -50,6 +50,7 @@ public partial class MainViewModel : ObservableObject
         UserListVm.OnSelected += UserSelect;
         UserListVm.RightClicked += Nothing;
         _eventHelper.ClearNewMessage += ClearNewMessage;
+        _eventHelper.FileReceive += DealReceiveImageOrFile;
 
         _myClient.AddTopic(MqttContent.GROUP);
         GC.Collect();
@@ -70,12 +71,11 @@ public partial class MainViewModel : ObservableObject
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             // 自己和群聊不删，其他都删(基本都是离线用户)
-            foreach (var item in UserListVm.Users)
+            for(int i = UserListVm.Users.Count - 1; i >= 0; i--)
             {
-                if (item.Uid != MyChatModel.Uid && !msgModel.userModels.Any(m => m.uid == item.Uid)
-                && !item.IsGroup)
+                if (UserListVm.Users[i].Uid != MyChatModel.Uid && !UserListVm.Users[i].IsGroup)
                 {
-                    UserListVm.Users.Remove(item);
+                    UserListVm.Users.RemoveAt(i);
                 }
             }
             foreach (var userModel in msgModel.userModels)
@@ -191,27 +191,24 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        if (_chatMessageDic.ContainsKey(newMsg.groupName))
         {
-            if (_chatMessageDic.ContainsKey(newMsg.groupName))
+            _chatMessageDic[newMsg.groupName].Add(chats);
+            if (newMsg.groupName != ChatObj.Uid)
             {
-                _chatMessageDic[newMsg.groupName].Add(chats);
-                if (newMsg.groupName != ChatObj.Uid)
-                {
-                    UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
-                    _allNewMessageCount++;
-                    _eventHelper.StartBlink();
-                }
-            }
-            else
-            {
-                _chatMessageDic.Add(newMsg.groupName, new List<ChatMessage> { chats });
-                _allNewMessageCount++;
                 UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+                _allNewMessageCount++;
                 _eventHelper.StartBlink();
             }
-            UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;
-        });
+        }
+        else
+        {
+            _chatMessageDic.Add(newMsg.groupName, new List<ChatMessage> { chats });
+            _allNewMessageCount++;
+            UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
+            _eventHelper.StartBlink();
+        }
+        UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;
     }
     
     /// <summary>
@@ -236,11 +233,6 @@ public partial class MainViewModel : ObservableObject
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
         UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
-        // TODO 这里应该是用户点击下载才会进入DealReceiveImageOrFile
-        if (newMsg.isImageOrFile)
-        {
-            DealReceiveImageOrFile(chats);
-        }
     }
 
     /// <summary>
@@ -291,7 +283,7 @@ public partial class MainViewModel : ObservableObject
     /// 处理发送文件，基于Socket
     /// </summary>
     /// <param name="isGroupMsg"></param>
-    private void DealSendImageOrFile(bool isGroupMsg, string? filePath)
+    private void DealSendImageOrFile(bool isGroupMsg, string filePath)
     {
         if (isGroupMsg)
         {
@@ -360,9 +352,12 @@ public partial class MainViewModel : ObservableObject
                         message = SendMsg,
                         isGroupMsg = isGroupMsg,
                         groupName = ChatObj.GroupName,
+                        // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
+                        // 需要拆分SendMsg，如果有多个文件也需要拆分
                         //isImageOrFile = true,
                         fileName = "CFxxxx_demoV2.0.2(1).zip",
-                        clientFilePath = "D:\\CFxxxx_demoV2.0.2(1).zip"
+                        clientFilePath = "D:\\CFxxxx_demoV2.0.2(1).zip",
+                        fileSize = "124.0M"
                     };
                     _myClient.SendMsg(topic, msgModel);
                     if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
@@ -405,11 +400,11 @@ public partial class MainViewModel : ObservableObject
         isTheme = !isTheme;
         if (isTheme)
         {
-            _themeService.SetTheme(ApplicationTheme.Light);
+            _themeService.SetTheme(ApplicationTheme.Dark);
         }
         else
         {
-            _themeService.SetTheme(ApplicationTheme.Dark);
+            _themeService.SetTheme(ApplicationTheme.Light);
         }
     }
 

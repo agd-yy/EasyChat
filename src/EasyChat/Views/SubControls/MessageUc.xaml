@@ -17,6 +17,44 @@
             </Setter>
         </Style>
 
+        <Style x:Key="StackPanelStyle" TargetType="StackPanel">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="PathStyleBase" TargetType="Path">
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFile}" Value="True">
+                    <Setter Property="Fill" Value="White"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PathStyleRight" TargetType="Path" BasedOn="{StaticResource PathStyleBase}">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Fill" Value="LightGray"/>
+            <Setter Property="Data" Value="M316.906804 600.553647l369.209487 292.918955a166.898002 166.898002 0 0 1 65.243759 130.527398V0a167.017642 167.017642 0 0 1-65.243759 130.527398L316.906804 423.446353a110.707014 110.707014 0 0 0-22.093547 154.973867 110.667134 110.667134 0 0 0 22.093547 22.133427z"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PathStyleLeft" TargetType="Path" BasedOn="{StaticResource PathStyleBase}">
+            <Setter Property="Fill" Value="LightBlue"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Data" Value="M377.4780684453485 789.1111583709719l279.6549224853515-279.65492248535156-278.8075160980225-278.80751609802246z"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMyMessage}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <!-- 消息气泡样式 -->
         <Style x:Key="MessageBubbleStyle" TargetType="Border">
             <Setter Property="CornerRadius" Value="10"/>
@@ -34,6 +72,9 @@
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsMyMessage}" Value="False">
                     <Setter Property="HorizontalAlignment" Value="Left"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsFile}" Value="True">
+                    <Setter Property="Background" Value="White"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -86,13 +127,13 @@
                     </Grid.RowDefinitions>
                     <!-- 左边头像 -->
                     <Border Grid.Column="0" Style="{StaticResource LeftAvatarStyle}" Margin="0 -20 0 0">
-                        <Ellipse Width="40" Height="40">
+                        <Ellipse Width="45" Height="45">
                             <Ellipse.Fill>
                                 <ImageBrush ImageSource="{Binding Image}" />
                             </Ellipse.Fill>
                         </Ellipse>
                     </Border>
-                    <StackPanel Orientation="Vertical"  Grid.Column="1">
+                    <StackPanel Grid.Column="1" Style="{StaticResource StackPanelStyle}" Orientation="Vertical">
                         <TextBlock Text="{Binding NickName}" FontWeight="Bold" FontSize="12" Foreground="Pink" Margin="10 0 0 0" HorizontalAlignment="Left">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -107,42 +148,66 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <!-- 消息气泡 -->
-                        <Border Style="{StaticResource MessageBubbleStyle}" MaxWidth ="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel}, Converter={StaticResource WidthPercentageConverter}, ConverterParameter=0.6}">
-                            <StackPanel Orientation="Vertical">
+                        <StackPanel Style="{StaticResource StackPanelStyle}" Orientation="Horizontal">
+                            <Path Style="{StaticResource PathStyleRight}" Margin="0 0 -5 0" />
+                            <!-- 消息气泡 -->
+                            <Border Style="{StaticResource MessageBubbleStyle}" MaxWidth ="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource WidthPercentageConverter}, ConverterParameter=0.6}">
+                                <StackPanel Orientation="Vertical">
 
-                            <!-- 消息文本 -->
-                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Message}" Value="">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                    <!-- 消息文本 -->
+                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,5">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Message}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsFile}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                            <!-- 时间  -->
-                            <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Time}" Value="">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                    <Button Command="{Binding FileReceiveCommand}"  CommandParameter="{Binding .}"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
+                                                <Setter Property="Width" Value="Auto"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFile}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                            <Image Width="20" Height="20" Source="{Binding Image}" Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    
+                                    <!-- 时间  -->
+                                    <TextBlock Text="{Binding Time}" Foreground="Gray" FontSize="10" HorizontalAlignment="Right">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Time}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <Path Style="{StaticResource PathStyleLeft}" Margin="-5 0 0 0" />
                         </StackPanel>
-                    </Border>
                     </StackPanel>
-
                     <!-- 右边头像 -->
                     <Border Grid.Column="2" Style="{StaticResource RightAvatarStyle}">
-                        <Ellipse Width="40" Height="40">
+                        <Ellipse Width="45" Height="45">
                             <Ellipse.Fill>
                                 <ImageBrush ImageSource="{Binding Image}" />
                             </Ellipse.Fill>

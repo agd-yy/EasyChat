@@ -7,10 +7,12 @@ namespace EasyChat.ViewModels.SubVms
 {
     public partial class MessageListVm : ObservableObject
     {
-        public Action<ChatMessage>? RightClicked { get; set; }
+        public Action<ChatMessage>? RecevieClicked { get; set; }
 
         [ObservableProperty] private BindingList<ChatMessage> _messages = [];
 
-        [RelayCommand] private void RightClick(ChatMessage message) => RightClicked?.Invoke(message);
+        [RelayCommand] private void FileReceive(ChatMessage message) => RecevieClicked?.Invoke(message);
+
+
     }
 }

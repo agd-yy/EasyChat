@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using EasyChat.Handle;
 
 namespace EasyChat.Models;
 
@@ -23,11 +25,17 @@ public partial class ChatMessage : ObservableObject
 
     [ObservableProperty] private bool isFile;
 
-    [ObservableProperty] private string? fileName;
+    [ObservableProperty] private string fileName = "";
 
-    [ObservableProperty] private string? fileSize;
+    [ObservableProperty] private string fileSize = "";
 
-    [ObservableProperty] private string? filePath;
+    [ObservableProperty] private string filePath = "";
 
     [ObservableProperty] private bool isReceived;
+
+    [RelayCommand]
+    private void FileReceive()
+    {
+        EventHelper.Instance.ReceiveFile(this);
+    }
 }

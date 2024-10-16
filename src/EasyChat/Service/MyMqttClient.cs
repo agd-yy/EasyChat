@@ -135,12 +135,11 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
     /// <param name="topic"></param>
     private async void SubOnlineServer(string topic)
     {
-        var qosLevel = 0; // QoS级别，可以是0、1或2
         try
         {
             // 订阅消息
             await MqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic)
-                .WithQualityOfServiceLevel((MqttQualityOfServiceLevel)qosLevel).Build());
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce).Build());
         }
         catch
         {
@@ -161,7 +160,7 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
         var message = new MqttApplicationMessageBuilder()
             .WithTopic(topic)
             .WithPayload(msg)
-            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce)
             .WithRetainFlag()
             .Build();
 
@@ -206,9 +205,10 @@ public class MyMqttClient : SingletonBase<MyMqttClient>
                 FileSendEvent?.Invoke(msgModel);
             }
         }
-        catch
+        catch(Exception)
         {
             // 解密失败
+            //System.Diagnostics.Debug.Write(">> ex:" + ex);
         }
     }
 }

@@ -3,6 +3,7 @@ using EasyChat.Extensions;
 using EasyChat.Models;
 using EasyChat.Utilities;
 using MQTTnet;
+using MQTTnet.Protocol;
 using MQTTnet.Server;
 
 namespace EasyChat.Service;
@@ -12,7 +13,7 @@ public class MqttService
     private static readonly MqttService mqttService = new();
     private static IMqttServer? server;
     // 记录当前在线客户端
-    private static List<UserModel> onlineClientUids = [];
+    private static List<UserModel> onlineClients = [];
 
     private MqttService()
     {
@@ -89,7 +90,7 @@ public class MqttService
             var clientId = userModel.uid;
             // 获取客户端发起的订阅主题
             var topic = args.TopicFilter.Topic;
-            Console.WriteLine($"客户端[{clientId}]已订阅主题:{topic}");
+            System.Diagnostics.Debug.WriteLine($"客户端[{clientId}]已订阅主题:{topic}");
         }
 
     }
@@ -106,7 +107,7 @@ public class MqttService
         // 获取客户端发起的订阅主题
         var topic = args.TopicFilter;
 
-        Console.WriteLine($"客户端[{clientId}]已退订主题:{topic}");
+        System.Diagnostics.Debug.WriteLine($"客户端[{clientId}]已退订主题:{topic}");
     }
 
     /// <summary>
@@ -131,7 +132,7 @@ public class MqttService
         // 获取消息的保持形式
         var retain = args.ApplicationMessage.Retain;
 
-        Console.WriteLine($"客户端[{clientId}] >> 主题: [{topic}] 内容: [{payload}] Qos: [{qos}] Retain:[{retain}]");
+        System.Diagnostics.Debug.WriteLine($"客户端[{clientId}] >> 主题: [{topic}] 内容: [{payload}] Qos: [{qos}] Retain:[{retain}]");
     }
 
     /// <summary>
@@ -146,14 +147,14 @@ public class MqttService
             return;
         }    
         userModel.isOnline = true;
-        if (!onlineClientUids.Any(o => o.uid == userModel.uid))
+        if (!onlineClients.Any(o => o.uid == userModel.uid))
         {
-            onlineClientUids.Add(userModel);
+            onlineClients.Add(userModel);
         }
-        onlineClientUids.RemoveAll(o => o.isOnline == false);
+        onlineClients.RemoveAll(o => o.isOnline == false);
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            userModels = onlineClientUids,
+            userModels = onlineClients,
             sendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);
@@ -170,11 +171,10 @@ public class MqttService
         {
             return;
         }
-        // 从 onlineClientUids中获取uid == userModel.uid的对象，然后修改isOnline状态
-        onlineClientUids.Where(o => o.uid == userModel.Uid).First().isOnline = false;
+        onlineClients.Where(o => o.uid == userModel.Uid).First().isOnline = false;
         var msg = EncryptUtilities.Encrypt(new MsgModel()
         {
-            userModels = onlineClientUids,
+            userModels = onlineClients,
             sendTime = DateTime.Now
         }.Serialize());
         ServierPublish(MqttContent.ONLINE, msg);
@@ -183,15 +183,15 @@ public class MqttService
 
     private static void ServierPublish(string topic, string msg)
     {
-        var mqttMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(topic)
-            .WithPayload(msg)
-            .WithExactlyOnceQoS() // 设置QoS
-            .WithRetainFlag()
-            .Build();
+            var mqttMessage = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(msg)
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtMostOnce)
+                .WithRetainFlag()
+                .Build();
 
-        // 发布消息
-        server.PublishAsync(mqttMessage);
+            // 发布消息
+            server.PublishAsync(mqttMessage);
     }
 
     #endregion
