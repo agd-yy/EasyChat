@@ -125,14 +125,9 @@ public partial class MainViewModel : ObservableObject
     /// <param name="newMsg"></param>
     private void ClientChangeReceiveFile(MsgModel newMsg)
     {
-        //if (newMsg.userModel.uid == MyChatModel.Uid)
-        //{
-        //    return;
-        //}
-        // 服务端准备好接收文件了
         if (newMsg.isServerReceived)
         {
-            DealSendImageOrFile(newMsg.isGroupMsg, newMsg.clientFilePath);
+            DealSendImageOrFile(newMsg.clientFilePath);
         }
     }
     /// <summary>
@@ -241,18 +236,6 @@ public partial class MainViewModel : ObservableObject
     /// <param name="newMsg"></param>
     private void DealReceiveImageOrFile(ChatMessage chats)
     {
-        _myClient.SendMsg(MqttContent.FILE, new MsgModel
-        {
-            userModel = MqttContent.ToUserModel(MyChatModel),
-            sendTime = DateTime.Now,
-            message = SendMsg,
-            isGroupMsg = ChatObj.IsGroup,
-            isServerReceived = true,
-            groupName = ChatObj.GroupName,
-            isImageOrFile = chats.IsFile,
-            fileName = chats.FileName,
-            clientFilePath = chats.FilePath
-        });
         try
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -265,6 +248,18 @@ public partial class MainViewModel : ObservableObject
             var result = saveFileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
+                _myClient.SendMsg(MqttContent.FILE, new MsgModel
+                {
+                    userModel = MqttContent.ToUserModel(MyChatModel),
+                    sendTime = DateTime.Now,
+                    message = SendMsg,
+                    isGroupMsg = ChatObj.IsGroup,
+                    isServerReceived = true,
+                    groupName = ChatObj.GroupName,
+                    isImageOrFile = chats.IsFile,
+                    fileName = chats.FileName,
+                    clientFilePath = chats.FilePath
+                });
                 var localFilePath = saveFileDialog.FileName;
                 if (!string.IsNullOrEmpty(localFilePath))
                 {
@@ -282,17 +277,16 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     /// 处理发送文件，基于Socket
     /// </summary>
-    /// <param name="isGroupMsg"></param>
-    private void DealSendImageOrFile(bool isGroupMsg, string filePath)
+    /// <param name="filePath"></param>
+    private void DealSendImageOrFile(string filePath)
     {
-        if (isGroupMsg)
+        if (!File.Exists(filePath))
         {
-            EcMsgBox.Show("暂不支持群文件~");
+            //System.Diagnostics.Debug.WriteLine("文件不存在");
             return;
         }
         var sockeClient = SocketClient.GetInctance(ChatObj.IpAddress, ChatObj.Port);
         _= sockeClient.SendFileAsync(filePath);
-
     }
     #endregion
 
@@ -345,6 +339,9 @@ public partial class MainViewModel : ObservableObject
                 {
                     var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
                     var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + _sendTopic;
+                    // TODO 判断消息内容中是否存在文件
+                    // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
+                    // 需要拆分SendMsg，如果有多个文件也需要拆分
                     var msgModel = new MsgModel
                     {
                         userModel =  MqttContent.ToUserModel(MyChatModel),
@@ -352,8 +349,6 @@ public partial class MainViewModel : ObservableObject
                         message = SendMsg,
                         isGroupMsg = isGroupMsg,
                         groupName = ChatObj.GroupName,
-                        // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
-                        // 需要拆分SendMsg，如果有多个文件也需要拆分
                         //isImageOrFile = true,
                         fileName = "CFxxxx_demoV2.0.2(1).zip",
                         clientFilePath = "D:\\CFxxxx_demoV2.0.2(1).zip",
@@ -480,6 +475,12 @@ public partial class MainViewModel : ObservableObject
             IsGroup = true
         });
         _chatMessageDic.TryAdd("群聊", new List<ChatMessage>());
+    }
+
+    private void WindowIsClosing()
+    {
+        // 判断当前窗口是否被关闭或者最小化
+        // TODO 上述情况下可能会没有新消息提示
     }
     #endregion
 }

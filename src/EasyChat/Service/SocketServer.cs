@@ -82,7 +82,6 @@ namespace EasyChat.Service
                             totalBytesReceived += bytesRead;
                         }
                     }
-                    EcMsgBox.Show($"文件接收完成，保存路径：{savedirectory}");
                     //System.Diagnostics.Debug.WriteLine($"文件接收完成，保存路径：{savedirectory}");
                 }
             }

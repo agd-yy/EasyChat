@@ -241,7 +241,7 @@
             <GridSplitter Grid.Row="3" Height="2" VerticalAlignment="Stretch" />
             
             <!-- send message -->
-            <Border x:Name="bdLeft" CornerRadius="8" Margin="4 4 8 4"  Grid.Row="4">
+            <DockPanel x:Name="bdLeft" Margin="4 4 8 4"  Grid.Row="4">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
@@ -251,7 +251,8 @@
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <ui:TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                    <ui:TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" 
+                                AllowDrop="True" 
                          TextWrapping="Wrap" AcceptsReturn="True"
                          Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <ui:TextBox.InputBindings>
@@ -267,7 +268,7 @@
                             Command="{Binding SendCommand}"
                             Content="发送" />
                 </Grid>
-            </Border>
+            </DockPanel>
         </Grid>
         <!--#endregion-->
         

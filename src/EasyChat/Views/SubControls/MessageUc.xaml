@@ -175,6 +175,7 @@
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
                                                 <Setter Property="Width" Value="Auto"/>
+                                                <Setter Property="ToolTip" Value="单击下载"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsFile}" Value="False">
                                                         <Setter Property="Visibility" Value="Collapsed" />
