@@ -15,6 +15,7 @@
       <Compile Remove="Controls\MyMessageChat.xaml.cs" />
       <Compile Remove="Controls\UserChat.xaml.cs" />
       <Compile Remove="Controls\UserImage.xaml.cs" />
+      <Compile Remove="Handle\PasswordBoxHelper.cs" />
       <Compile Remove="Views\ChatView.xaml.cs" />
     </ItemGroup>
 

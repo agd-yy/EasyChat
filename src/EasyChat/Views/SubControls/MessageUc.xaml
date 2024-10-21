@@ -171,7 +171,7 @@
                                     </TextBlock>
 
                                     <Button Command="{Binding FileReceiveCommand}"  CommandParameter="{Binding .}"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" Height="auto">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource IconButton}">
                                                 <Setter Property="Width" Value="Auto"/>
@@ -184,8 +184,19 @@
                                             </Style>
                                         </Button.Style>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
-                                            <Image Width="20" Height="20" Source="{Binding Image}" Margin="5,0,5,0"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition  Height="Auto"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0"  Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Row="1"  Text="{Binding FileSize}" VerticalAlignment="Bottom"/>
+                                                <Image Grid.Row="0" Grid.Column="1" Width="20" Height="20" Source="{Binding Image}" Margin="5,0,5,0"/>
+                                            </Grid>
                                         </StackPanel>
                                     </Button>
                                     

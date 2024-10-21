@@ -6,6 +6,7 @@
                  xmlns:vm="clr-namespace:EasyChat.ViewModels"
                  xmlns:view="clr-namespace:EasyChat.Views"
                  xmlns:subView="clr-namespace:EasyChat.Views.SubControls"
+                 xmlns:extensions="clr-namespace:EasyChat.Extensions"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  mc:Ignorable="d"
                  Height="600"
@@ -104,7 +105,7 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="60" />
@@ -241,34 +242,32 @@
             <GridSplitter Grid.Row="3" Height="2" VerticalAlignment="Stretch" />
             
             <!-- send message -->
-            <DockPanel x:Name="bdLeft" Margin="4 4 8 4"  Grid.Row="4">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <ui:TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" 
-                                AllowDrop="True" 
-                         TextWrapping="Wrap" AcceptsReturn="True"
-                         Text="{Binding SendMsg, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <ui:TextBox.InputBindings>
-                            <KeyBinding Command="{Binding SendCommand}" Key="Enter"/>
-                        </ui:TextBox.InputBindings>
-                    </ui:TextBox>
-                    <ui:Button Grid.Column="1" Grid.Row="1"
-                            FontSize="24"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            IsEnabled="{Binding SendMsg, Converter={StaticResource StringToBooleanConverter}}"
-                            Icon="{ui:SymbolIcon Symbol=Send24}"
+            <Grid Grid.Row="4">
+                <StackPanel>
+                    <StackPanel Height="30"  Orientation="Horizontal">
+                        <ui:Button Command="{Binding NothingCommand}" Background="Transparent" BorderBrush="Transparent" Content="{ui:SymbolIcon Symbol=Emoji16}" Width="38" Height="30"/>
+                        <ui:Button Command="{Binding FileBrowseCommand}" Background="Transparent" BorderBrush="Transparent" Content="{ui:SymbolIcon Symbol=Document16}" Width="38" Height="30"/>
+                        <ui:Button Command="{Binding NothingCommand}" Background="Transparent" BorderBrush="Transparent" Content="{ui:SymbolIcon Symbol=ScreenCut20}" Width="38" Height="30"/>
+                        <ui:Button Command="{Binding NothingCommand}" Background="Transparent" BorderBrush="Transparent" Content="{ui:SymbolIcon Symbol=MoviesAndTv16}" Width="38" Height="30"/>
+                        <ui:Button Command="{Binding NothingCommand}" Background="Transparent" BorderBrush="Transparent" Content="{ui:SymbolIcon Symbol=Camera16}" Width="38" Height="30"/>
+                    </StackPanel>
+                    <ScrollViewer MinHeight="80" Focusable="False">
+                        <RichTextBox AllowDrop="True" extensions:RichTextBoxExtensions.Document="{Binding SendMsg,Mode=TwoWay}" 
+                                     Background="Transparent" BorderBrush="Transparent" BorderThickness="0" 
+                                     AcceptsReturn="True">
+                            <RichTextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding SendCommand}"/>
+                            </RichTextBox.InputBindings>
+                        </RichTextBox>
+                    </ScrollViewer>
+                    <StackPanel Height="30" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button  FontSize="20" HorizontalAlignment="Center"  VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon Symbol=Send16}"
                             Command="{Binding SendCommand}"
                             Content="发送" />
-                </Grid>
-            </DockPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </Grid>
         <!--#endregion-->
         

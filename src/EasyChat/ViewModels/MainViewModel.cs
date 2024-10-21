@@ -11,6 +11,8 @@ using System.IO;
 using Wpf.Ui.Appearance;
 using Wpf.Ui;
 using System.Windows.Forms;
+using System.Windows.Documents;
+using System.Windows.Controls;
 
 namespace EasyChat.ViewModels;
 
@@ -46,7 +48,7 @@ public partial class MainViewModel : ObservableObject
         _myClient.OnlinePersonEvent += ClientChangeOnlinePerson;
         _myClient.ReceiveMsgEvent += ClientChangeReceiveMsg;
         _myClient.FileSendEvent += ClientChangeReceiveFile;
-        // 用户选择回调
+
         UserListVm.OnSelected += UserSelect;
         UserListVm.RightClicked += Nothing;
         _eventHelper.ClearNewMessage += ClearNewMessage;
@@ -203,7 +205,8 @@ public partial class MainViewModel : ObservableObject
             UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().MessageCount++;
             _eventHelper.StartBlink();
         }
-        UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message = newMsg.message;
+        UserListVm.Users.Where(x => x.Uid == newMsg.groupName).First().Message =
+            newMsg.isImageOrFile ? MqttContent.FILE_STRING + newMsg.fileName : newMsg.message;
     }
     
     /// <summary>
@@ -227,7 +230,8 @@ public partial class MainViewModel : ObservableObject
         {
             _chatMessageDic.Add(newMsg.userModel.uid, new List<ChatMessage> { chats });
         }
-        UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message = newMsg.message;
+        UserListVm.Users.Where(x => x.Uid == newMsg.userModel.uid).First().Message =
+            newMsg.isImageOrFile ? MqttContent.FILE_STRING + newMsg.fileName : newMsg.message;
     }
 
     /// <summary>
@@ -252,7 +256,7 @@ public partial class MainViewModel : ObservableObject
                 {
                     userModel = MqttContent.ToUserModel(MyChatModel),
                     sendTime = DateTime.Now,
-                    message = SendMsg,
+                    message = FlowDocumentToString(SendMsg),
                     isGroupMsg = ChatObj.IsGroup,
                     isServerReceived = true,
                     groupName = ChatObj.GroupName,
@@ -331,47 +335,85 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Send()
     {
+        if(string.IsNullOrEmpty(ChatObj.Uid))
+        {
+            EcMsgBox.Show("先选择用户");
+            return;
+        }    
         try
         {
-            if (!string.IsNullOrEmpty(SendMsg))
+            if (!string.IsNullOrEmpty(FlowDocumentToString(SendMsg)) || _nowFileList.Count > 0)
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var isGroupMsg = string.IsNullOrEmpty(ChatObj.NickName) || ChatObj.IsGroup;
+                    var isGroupMsg = ChatObj.IsGroup;
                     var topic = isGroupMsg ? MqttContent.GROUP : MqttContent.MESSAGE + _sendTopic;
-                    // TODO 判断消息内容中是否存在文件
-                    // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
-                    // 需要拆分SendMsg，如果有多个文件也需要拆分
-                    var msgModel = new MsgModel
+                    if (_nowFileList.Count > 0)
                     {
-                        userModel =  MqttContent.ToUserModel(MyChatModel),
-                        sendTime = DateTime.Now,
-                        message = SendMsg,
-                        isGroupMsg = isGroupMsg,
-                        groupName = ChatObj.GroupName,
-                        //isImageOrFile = true,
-                        fileName = "CFxxxx_demoV2.0.2(1).zip",
-                        clientFilePath = "D:\\CFxxxx_demoV2.0.2(1).zip",
-                        fileSize = "124.0M"
-                    };
-                    _myClient.SendMsg(topic, msgModel);
-                    if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
-                    {
-                        if (_chatMessageDic.ContainsKey(_sendTopic))
+                        for (int i = 0; i < _nowFileList.Count; i++)
                         {
-                            _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModel, MyChatModel.Uid));
-                            UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
-                            UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
-                            ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
+                            var msgModel = new MsgModel
+                            {
+                                userModel = MqttContent.ToUserModel(MyChatModel),
+                                sendTime = DateTime.Now,
+                                message = FlowDocumentToString(SendMsg),
+                                isGroupMsg = isGroupMsg,
+                                groupName = ChatObj.GroupName,
+                                isImageOrFile = true,
+                                fileName = _nowFileList[i].fileName,
+                                clientFilePath = _nowFileList[i].clientFilePath,
+                                fileSize = _nowFileList[i].fileSize
+                            };
+                            // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
+                            _myClient.SendMsg(topic, msgModel);
+                            if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
+                            {
+                                if (_chatMessageDic.ContainsKey(_sendTopic))
+                                {
+                                    _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModel, MyChatModel.Uid));
+                                    UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
+                                    UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
+                                    ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
+                                }
+                            }
+                        }
+                        _nowFileList.Clear();
+                    }
+                    else
+                    {
+                        var msgModel = new MsgModel
+                        {
+                            userModel =  MqttContent.ToUserModel(MyChatModel),
+                            sendTime = DateTime.Now,
+                            message = FlowDocumentToString(SendMsg),
+                            isGroupMsg = isGroupMsg,
+                            groupName = ChatObj.GroupName,
+                        };
+                        _myClient.SendMsg(topic, msgModel);
+                        if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
+                        {
+                            if (_chatMessageDic.ContainsKey(_sendTopic))
+                            {
+                                _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModel, MyChatModel.Uid));
+                                UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
+                                UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
+                                ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
+                            }
                         }
                     }
-                    SendMsg = "";
+                    
+                    SendMsg = new FlowDocument();
                 });
+            }
+            else
+            {
+                EcMsgBox.Show("发送内容或对象不可为空");
             }
         }
         catch (Exception ex)
         {
-            EcMsgBox.Show(ex.Message);
+            EcMsgBox.Show("发送失败");
+            System.Diagnostics.Debug.WriteLine(">>>>"+ex);
         }
     }
 
@@ -403,9 +445,15 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private List<FileModel> _nowFileList = new List<FileModel>();
     [RelayCommand]
-    private void FileBroser()
+    private void FileBrowse()
     {
+        if (string.IsNullOrEmpty(ChatObj.Uid))
+        {
+            EcMsgBox.Show("先选择用户");
+            return;
+        }
         OpenFileDialog dialog = new OpenFileDialog();
         dialog.Filter = "所有文件(*.*)|*.*";
         dialog.Multiselect = true;
@@ -414,22 +462,17 @@ public partial class MainViewModel : ObservableObject
         if (result == DialogResult.OK)
         {
             string[] names = dialog.FileNames;
-            string[] namesWithoutDirectory = dialog.SafeFileNames;
-
-            //初始化一下两个字符串数组，之所以用names来初始化是为了保持大小一致
-            //filePaths = names;
-            //fileNames = namesWithoutDirectory;
-
             foreach (string name in names)
             {
                 FileInfo myFI = new FileInfo(name);
-
-                //添加到待发送文件列表中显示出来
-                ListViewItem tmp = new ListViewItem();
-                tmp.Text = myFI.Name;
-                tmp.SubItems.Add(myFI.DirectoryName);
-                //his.listView_fileSend.Items.Add(tmp);
+                _nowFileList.Add(new FileModel
+                {
+                    fileName = myFI.Name,
+                    clientFilePath = myFI.FullName,
+                    fileSize = MqttContent.FileSizeToString(myFI.Length),
+                });
             }
+            //添加到界面显示出来 TODO 
         }
     }
     #endregion
@@ -450,7 +493,7 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     ///     发送信息
     /// </summary>
-    [ObservableProperty] private string _sendMsg = string.Empty;
+    [ObservableProperty] private FlowDocument _sendMsg = new FlowDocument();
 
     /// <summary>
     ///     用户自己
@@ -481,6 +524,32 @@ public partial class MainViewModel : ObservableObject
     {
         // 判断当前窗口是否被关闭或者最小化
         // TODO 上述情况下可能会没有新消息提示
+    }
+
+    private string FlowDocumentToString(FlowDocument document)
+    {
+        string rtn = "";
+        foreach (Paragraph block in document.Blocks)
+        {
+            foreach (var item in block.Inlines)
+            {
+                if (item is Run r)
+                {
+                    rtn += r.Text;
+                }
+                else if (item is LineBreak)
+                {
+                    rtn += Environment.NewLine;
+                }
+                else if (item is InlineUIContainer ui)
+                {
+                    ContentControl image = (ContentControl)ui.Child;
+                    rtn += image.Content.ToString();
+                }
+            }
+            rtn += Environment.NewLine;
+        }
+        return rtn.TrimEnd();
     }
     #endregion
 }
