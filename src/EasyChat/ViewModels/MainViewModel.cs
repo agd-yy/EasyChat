@@ -129,7 +129,13 @@ public partial class MainViewModel : ObservableObject
     {
         if (newMsg.isServerReceived)
         {
-            DealSendImageOrFile(newMsg.clientFilePath);
+            if (!File.Exists(newMsg.clientFilePath))
+            {
+                //System.Diagnostics.Debug.WriteLine("文件不存在");
+                return;
+            }
+            var sockeClient = SocketClient.GetInctance();
+            _ = sockeClient.SendFileAsync(newMsg.clientFilePath, newMsg.userModel.ipAddress, newMsg.userModel.port);
         }
     }
     /// <summary>
@@ -254,12 +260,9 @@ public partial class MainViewModel : ObservableObject
             {
                 _myClient.SendMsg(MqttContent.FILE, new MsgModel
                 {
-                    userModel = MqttContent.ToUserModel(MyChatModel),
+                    userModel = chats.UserModel,
                     sendTime = DateTime.Now,
-                    message = FlowDocumentToString(SendMsg),
-                    isGroupMsg = ChatObj.IsGroup,
                     isServerReceived = true,
-                    groupName = ChatObj.GroupName,
                     isImageOrFile = chats.IsFile,
                     fileName = chats.FileName,
                     clientFilePath = chats.FilePath
@@ -276,21 +279,6 @@ public partial class MainViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"文件处理发生错误");
         }
 
-    }
-
-    /// <summary>
-    /// 处理发送文件，基于Socket
-    /// </summary>
-    /// <param name="filePath"></param>
-    private void DealSendImageOrFile(string filePath)
-    {
-        if (!File.Exists(filePath))
-        {
-            //System.Diagnostics.Debug.WriteLine("文件不存在");
-            return;
-        }
-        var sockeClient = SocketClient.GetInctance(ChatObj.IpAddress, ChatObj.Port);
-        _= sockeClient.SendFileAsync(filePath);
     }
     #endregion
 
@@ -362,7 +350,7 @@ public partial class MainViewModel : ObservableObject
                                 isImageOrFile = true,
                                 fileName = _nowFileList[i].fileName,
                                 clientFilePath = _nowFileList[i].clientFilePath,
-                                fileSize = _nowFileList[i].fileSize
+                                fileSize = _nowFileList[i].fileSize,
                             };
                             // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
                             _myClient.SendMsg(topic, msgModel);
@@ -413,7 +401,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             EcMsgBox.Show("发送失败");
-            System.Diagnostics.Debug.WriteLine(">>>>"+ex);
+            //System.Diagnostics.Debug.WriteLine(">>>>"+ex);
         }
     }
 
@@ -478,11 +466,9 @@ public partial class MainViewModel : ObservableObject
     #endregion
 
     #region Property
-    [ObservableProperty]
-    private bool _isMaximized;
+    [ObservableProperty] private bool _isMaximized;
 
-    [ObservableProperty]
-    private bool _isTopmost;
+    [ObservableProperty] private bool _isTopmost;
 
     // 左侧用户
     public UserListVm UserListVm { get; } = new();
@@ -526,6 +512,11 @@ public partial class MainViewModel : ObservableObject
         // TODO 上述情况下可能会没有新消息提示
     }
 
+    /// <summary>
+    /// 富文本内容转字符串
+    /// </summary>
+    /// <param name="document"></param>
+    /// <returns></returns>
     private string FlowDocumentToString(FlowDocument document)
     {
         string rtn = "";

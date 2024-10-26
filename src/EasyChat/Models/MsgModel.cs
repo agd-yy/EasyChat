@@ -1,12 +1,12 @@
 namespace EasyChat.Models;
 
 /// <summary>
-/// 消息封装体对象
+/// Mqtt消息封装体对象
 /// </summary>
 public class MsgModel
 {
     /// <summary>
-    /// userModel
+    /// 发送者userModel
     /// </summary>
     public UserModel userModel { get; set; } = new UserModel();
 

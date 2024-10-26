@@ -6,27 +6,22 @@ namespace EasyChat.Service
     public class SocketClient
     {
         private static SocketClient? _client;
-        private string _serverIP;
-        private int _serverPort;
 
-        private SocketClient(string serverIP, int serverPort)
+        private SocketClient()
         {
-            _serverIP = serverIP;
-            _serverPort = serverPort;
         }
 
-
-        public static SocketClient GetInctance(string serverIP, int serverPort)
+        public static SocketClient GetInctance()
         {
             if (_client == null)
             {
-                _client = new SocketClient(serverIP, serverPort);
+                _client = new SocketClient();
             }
             return _client;
         }
 
         // 发送文件
-        public async Task SendFileAsync(string filePath)
+        public async Task SendFileAsync(string filePath, string ip, int port)
         {
             //if (!File.Exists(filePath))
             //{
@@ -36,7 +31,7 @@ namespace EasyChat.Service
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
             try
             {
-                client.Connect(_serverIP, _serverPort);
+                client.Connect(ip, port);
                 using NetworkStream networkStream = client.GetStream();
                 FileInfo fileInfo = new FileInfo(filePath);
 

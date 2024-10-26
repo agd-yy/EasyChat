@@ -80,7 +80,8 @@ public static class MqttContent
             IsFile = msgModel.isImageOrFile,
             FilePath = msgModel.clientFilePath,
             FileSize = msgModel.fileSize,
-            FileName = msgModel.fileName
+            FileName = msgModel.fileName,
+            UserModel = msgModel.userModel
         };
     }
 

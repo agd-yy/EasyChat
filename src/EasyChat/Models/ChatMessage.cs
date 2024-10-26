@@ -33,6 +33,8 @@ public partial class ChatMessage : ObservableObject
 
     [ObservableProperty] private bool isReceived;
 
+    public UserModel UserModel = new UserModel();
+
     [RelayCommand]
     private void FileReceive()
     {

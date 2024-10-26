@@ -87,6 +87,7 @@ namespace EasyChat.Service
             }
             catch (Exception ex)
             {
+                EcMsgBox.Show($"文件接收失败");
                 System.Diagnostics.Debug.WriteLine($"文件接收失败：{ex.Message}");
             }
             finally
