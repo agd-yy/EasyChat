@@ -54,7 +54,7 @@ namespace EasyChat.Service
             {
                 using (NetworkStream networkStream = client.GetStream())
                 {
-                    networkStream.ReadTimeout = 5000;
+                    networkStream.ReadTimeout = 3000;
                     // 读取文件名长度
                     byte[] fileNameLengthBuffer = new byte[4];
                     await networkStream.ReadAsync(fileNameLengthBuffer, 0, fileNameLengthBuffer.Length);

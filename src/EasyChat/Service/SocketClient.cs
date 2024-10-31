@@ -23,11 +23,11 @@ namespace EasyChat.Service
         // 发送文件
         public async Task SendFileAsync(string filePath, string ip, int port)
         {
-            //if (!File.Exists(filePath))
-            //{
-            //    //System.Diagnostics.Debug.WriteLine("文件不存在");
-            //    return;
-            //}
+            if (!File.Exists(filePath)  || string.IsNullOrEmpty(ip))
+            {
+                //System.Diagnostics.Debug.WriteLine("文件不存在");
+                return;
+            }
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
             try
             {

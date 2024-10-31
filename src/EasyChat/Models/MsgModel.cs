@@ -63,6 +63,16 @@ public class MsgModel
     public bool isServerReceived { get; set; } = false;
 
     /// <summary>
+    /// 服务端IP地址
+    /// </summary>
+    public string serverIp { get; set; } = "";
+
+    /// <summary>
+    /// 服务端端口
+    /// </summary>
+    public int serverPort { get; set; }
+
+    /// <summary>
     /// 大文件分片传输：片总数
     /// </summary>
     public int totalChunks { get; set; } = 1;

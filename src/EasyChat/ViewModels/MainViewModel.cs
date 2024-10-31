@@ -129,13 +129,8 @@ public partial class MainViewModel : ObservableObject
     {
         if (newMsg.isServerReceived)
         {
-            if (!File.Exists(newMsg.clientFilePath))
-            {
-                //System.Diagnostics.Debug.WriteLine("文件不存在");
-                return;
-            }
             var sockeClient = SocketClient.GetInctance();
-            _ = sockeClient.SendFileAsync(newMsg.clientFilePath, newMsg.userModel.ipAddress, newMsg.userModel.port);
+            _ = sockeClient.SendFileAsync(newMsg.clientFilePath, newMsg.serverIp, newMsg.serverPort);
         }
     }
     /// <summary>
@@ -265,7 +260,9 @@ public partial class MainViewModel : ObservableObject
                     isServerReceived = true,
                     isImageOrFile = chats.IsFile,
                     fileName = chats.FileName,
-                    clientFilePath = chats.FilePath
+                    clientFilePath = chats.FilePath,
+                    serverIp = MyChatModel.IpAddress,
+                    serverPort = MyChatModel.Port
                 });
                 var localFilePath = saveFileDialog.FileName;
                 if (!string.IsNullOrEmpty(localFilePath))
@@ -340,7 +337,7 @@ public partial class MainViewModel : ObservableObject
                     {
                         for (int i = 0; i < _nowFileList.Count; i++)
                         {
-                            var msgModel = new MsgModel
+                            var msgModelFile = new MsgModel
                             {
                                 userModel = MqttContent.ToUserModel(MyChatModel),
                                 sendTime = DateTime.Now,
@@ -353,21 +350,22 @@ public partial class MainViewModel : ObservableObject
                                 fileSize = _nowFileList[i].fileSize,
                             };
                             // 发送文件时，先发送MQTT消息，等接收方确认再用Socket连接发送文件
-                            _myClient.SendMsg(topic, msgModel);
+                            _myClient.SendMsg(topic, msgModelFile);
                             if (!isGroupMsg && !MyChatModel.Uid.Equals(_sendTopic))
                             {
                                 if (_chatMessageDic.ContainsKey(_sendTopic))
                                 {
-                                    _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModel, MyChatModel.Uid));
+                                    _chatMessageDic[_sendTopic].Add(MqttContent.ToChatMessage(msgModelFile, MyChatModel.Uid));
                                     UserListVm.Users.Where(x => x.Uid == _sendTopic).First().MessageCount = 0;
-                                    UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModel.message;
+                                    UserListVm.Users.Where(x => x.Uid == _sendTopic).First().Message = msgModelFile.message;
                                     ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
                                 }
                             }
                         }
                         _nowFileList.Clear();
                     }
-                    else
+                   
+                    if (!string.IsNullOrEmpty(FlowDocumentToString(SendMsg)))
                     {
                         var msgModel = new MsgModel
                         {
@@ -388,20 +386,19 @@ public partial class MainViewModel : ObservableObject
                                 ChatMessages.Messages = new BindingList<ChatMessage>(_chatMessageDic[_sendTopic]);
                             }
                         }
+                        SendMsg = new FlowDocument();
                     }
-                    
-                    SendMsg = new FlowDocument();
                 });
             }
             else
             {
-                EcMsgBox.Show("发送内容或对象不可为空");
+                EcMsgBox.Show("发送内容不可为空");
             }
         }
         catch (Exception ex)
         {
             EcMsgBox.Show("发送失败");
-            //System.Diagnostics.Debug.WriteLine(">>>>"+ex);
+            System.Diagnostics.Debug.WriteLine(">>>>"+ex);
         }
     }
 
@@ -449,18 +446,23 @@ public partial class MainViewModel : ObservableObject
 
         if (result == DialogResult.OK)
         {
-            string[] names = dialog.FileNames;
-            foreach (string name in names)
-            {
-                FileInfo myFI = new FileInfo(name);
-                _nowFileList.Add(new FileModel
-                {
-                    fileName = myFI.Name,
-                    clientFilePath = myFI.FullName,
-                    fileSize = MqttContent.FileSizeToString(myFI.Length),
-                });
-            }
             //添加到界面显示出来 TODO 
+            // 微信使用一个新弹窗，点击发送按钮或取消按钮
+            string[] names = dialog.FileNames;
+            if (names.Length > 0)
+            {
+                foreach (string name in names)
+                {
+                    FileInfo myFI = new FileInfo(name);
+                    _nowFileList.Add(new FileModel
+                    {
+                        fileName = myFI.Name,
+                        clientFilePath = myFI.FullName,
+                        fileSize = MqttContent.FileSizeToString(myFI.Length),
+                    });
+                }
+
+            }
         }
     }
     #endregion
