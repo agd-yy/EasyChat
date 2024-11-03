@@ -78,10 +78,12 @@ namespace EasyChat.Service
 
                         while (totalBytesReceived < fileSize && (bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                         {
+                            // TODO 这里可以做进度条展示到界面上
                             await fileStream.WriteAsync(buffer, 0, bytesRead);
                             totalBytesReceived += bytesRead;
                         }
                     }
+                    // TODO 提示文件下载完成,同时修改聊天窗口文件消息状态，再次点击可以打开文件所在文件夹
                     //System.Diagnostics.Debug.WriteLine($"文件接收完成，保存路径：{savedirectory}");
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using EasyChat.Controls;
+using System.IO;
 using System.Net.Sockets;
 
 namespace EasyChat.Service
@@ -20,12 +21,19 @@ namespace EasyChat.Service
             return _client;
         }
 
-        // 发送文件
+        /// <summary>
+        /// 发送文件
+        /// 这个filePath是发送方的路径，如果发送方发完消息删除了文件就会收不到文件
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public async Task SendFileAsync(string filePath, string ip, int port)
         {
             if (!File.Exists(filePath)  || string.IsNullOrEmpty(ip))
             {
-                //System.Diagnostics.Debug.WriteLine("文件不存在");
+                EcMsgBox.Show("文件不见了~");
                 return;
             }
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
@@ -50,8 +58,6 @@ namespace EasyChat.Service
                 // 发送文件大小
                 byte[] fileSizeBytes = BitConverter.GetBytes(fileSize);
                 await networkStream.WriteAsync(fileSizeBytes, 0, fileSizeBytes.Length);
-
-                //System.Diagnostics.Debug.WriteLine($"开始发送文件：{fileName}, 大小：{fileSize} bytes");
 
                 // 发送文件内容
                 using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))

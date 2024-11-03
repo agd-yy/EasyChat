@@ -5,14 +5,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EasyChat.Views.SubControls"
              mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        
-             d:DesignHeight="450" d:DesignWidth="300">
+            ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True"
+            MouseLeftButtonDown="Window_MouseLeftButtonDown"  Height="400" Width="250">
     <Grid>
-        <ListView ItemsSource="{Binding FileList}" DisplayMemberPath="fileName" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="发送" Width="80" Margin="5" IsDefault="True" Click="OnSendClicked" />
-            <Button Content="取消" Width="80" Margin="5" IsCancel="True" Click="OnCancelClicked" />
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            
+        </Grid>
+        <Grid Grid.Row="1" >
+            <ListView ItemsSource="{Binding FileList}" DisplayMemberPath="fileName" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
+                <Button Content="发送" Width="80" Margin="5" IsDefault="True" Click="OnSendClicked" />
+                <Button Content="取消" Width="80" Margin="5" IsCancel="True" Click="OnCancelClicked" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

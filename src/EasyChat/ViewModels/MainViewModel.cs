@@ -13,6 +13,7 @@ using Wpf.Ui;
 using System.Windows.Forms;
 using System.Windows.Documents;
 using System.Windows.Controls;
+using EasyChat.Views.SubControls;
 
 namespace EasyChat.ViewModels;
 
@@ -236,7 +237,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 处理接收文件
+    /// 处理用户点击接收文件
     /// </summary>
     /// <param name="newMsg"></param>
     private void DealReceiveImageOrFile(ChatMessage chats)
@@ -446,8 +447,6 @@ public partial class MainViewModel : ObservableObject
 
         if (result == DialogResult.OK)
         {
-            //添加到界面显示出来 TODO 
-            // 微信使用一个新弹窗，点击发送按钮或取消按钮
             string[] names = dialog.FileNames;
             if (names.Length > 0)
             {
@@ -460,6 +459,16 @@ public partial class MainViewModel : ObservableObject
                         clientFilePath = myFI.FullName,
                         fileSize = MqttContent.FileSizeToString(myFI.Length),
                     });
+                }
+                var fileSendPreviewUc = new FileSendPreviewUc(_nowFileList, MqttContent.ToUserModel(ChatObj));
+                fileSendPreviewUc.ShowDialog();
+                if (fileSendPreviewUc.DialogResult != null && fileSendPreviewUc.DialogResult.Value)
+                {
+                    Send();
+                }
+                else
+                {
+                    _nowFileList.Clear();
                 }
 
             }
