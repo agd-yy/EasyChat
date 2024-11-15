@@ -33,7 +33,10 @@ namespace EasyChat.Service
         {
             if (!File.Exists(filePath)  || string.IsNullOrEmpty(ip))
             {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
                 EcMsgBox.Show("文件不见了~");
+                });
                 return;
             }
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
