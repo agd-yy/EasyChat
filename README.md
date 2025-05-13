@@ -14,11 +14,12 @@
 1. 仅支持Windows系统。
 
 #### 登录界面
-<img src="https://github.com/agd-yy/EasyChat/tree/main/img/login1.jpg" width="50%" height="50%">
-<img src="https://github.com/agd-yy/EasyChat/tree/main/img/login1.jpg" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/blob/main/img/login1.png" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/blob/main/img/login1.png" width="50%" height="50%">
+
 #### 主界面
-<img src="https://github.com/agd-yy/EasyChat/tree/main/img/main1.jpg" width="50%" height="50%">
-<img src="https://github.com/agd-yy/EasyChat/tree/main/img/main2.jpg" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/blob/main/img/main1.png" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/blob/main/img/main2.png" width="50%" height="50%">
 
 > 待办项：
 
