@@ -13,6 +13,13 @@
 
 1. 仅支持Windows系统。
 
+#### 登录界面
+<img src="https://github.com/agd-yy/EasyChat/tree/main/img/login1.jpg" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/tree/main/img/login1.jpg" width="50%" height="50%">
+#### 主界面
+<img src="https://github.com/agd-yy/EasyChat/tree/main/img/main1.jpg" width="50%" height="50%">
+<img src="https://github.com/agd-yy/EasyChat/tree/main/img/main2.jpg" width="50%" height="50%">
+
 > 待办项：
 
 - [ ] 程序运行内存优化
